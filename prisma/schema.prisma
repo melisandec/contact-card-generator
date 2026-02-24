@@ -75,6 +75,12 @@ model Design {
   updatedAt DateTime @updatedAt
   userId    String
 
+  // QR Contact fields
+  qrSettings Json?
+  qrData     String?
+  qrFormat   String?   @default("vcard")
+  lastQRSync DateTime?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
