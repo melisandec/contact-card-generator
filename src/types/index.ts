@@ -113,3 +113,77 @@ export interface ColorStop {
   color: string;
   position: number;
 }
+
+// QR Contact Types
+
+export interface ContactPhone {
+  type: 'work' | 'home' | 'mobile' | 'fax' | 'pager' | 'other';
+  number: string;
+  preferred?: boolean;
+}
+
+export interface ContactEmail {
+  type: 'work' | 'home' | 'personal' | 'other';
+  address: string;
+  preferred?: boolean;
+}
+
+export interface ContactAddress {
+  type: 'work' | 'home' | 'other';
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+export interface ContactWebsite {
+  type: 'work' | 'personal' | 'portfolio' | 'other';
+  url: string;
+}
+
+export interface ContactSocialMedia {
+  platform: 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'github' | 'other';
+  username: string;
+  url?: string;
+}
+
+export interface ContactCustomField {
+  label: string;
+  value: string;
+}
+
+export interface ContactData {
+  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  middleName?: string;
+  prefix?: string;
+  suffix?: string;
+  nickname?: string;
+  title?: string;
+  company?: string;
+  department?: string;
+  role?: string;
+  phones?: ContactPhone[];
+  emails?: ContactEmail[];
+  addresses?: ContactAddress[];
+  websites?: ContactWebsite[];
+  socialMedia?: ContactSocialMedia[];
+  birthday?: string;
+  notes?: string;
+  photo?: string;
+  logo?: string;
+  customFields?: ContactCustomField[];
+}
+
+export interface QRContactOptions {
+  format: 'vcard' | 'mecard';
+  encoding?: string;
+  version?: string;
+  errorCorrection?: 'L' | 'M' | 'Q' | 'H';
+  margin?: number;
+  foregroundColor?: string;
+  backgroundColor?: string;
+  size?: number;
+}
