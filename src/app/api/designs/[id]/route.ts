@@ -63,16 +63,37 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { name, data, width, height, thumbnail, isPublic } = body;
+    const {
+      name,
+      description,
+      data,
+      frontLayers,
+      backLayers,
+      isDoubleSided,
+      width,
+      height,
+      thumbnail,
+      thumbnailUrl,
+      templateId,
+      tags,
+      isPublic,
+    } = body;
 
     const updated = await prisma.design.update({
       where: { id },
       data: {
         ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
         ...(data !== undefined && { data }),
+        ...(frontLayers !== undefined && { frontLayers }),
+        ...(backLayers !== undefined && { backLayers }),
+        ...(isDoubleSided !== undefined && { isDoubleSided }),
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
         ...(thumbnail !== undefined && { thumbnail }),
+        ...(thumbnailUrl !== undefined && { thumbnailUrl }),
+        ...(templateId !== undefined && { templateId }),
+        ...(tags !== undefined && { tags }),
         ...(isPublic !== undefined && { isPublic }),
       },
     });
