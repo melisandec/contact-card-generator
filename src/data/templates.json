@@ -1,0 +1,453 @@
+[
+  {
+    "id": "corp-1",
+    "name": "Executive Blue",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corp1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#1e3a5f" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 80, "width": 300, "height": 50, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "John Smith", "fontFamily": "Inter", "fontSize": 32, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 140, "width": 280, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Senior Executive", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#93c5fd", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 320, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "john.smith@company.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 355, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "+1 (555) 234-5678", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "e5", "type": "shape", "x": 500, "y": 0, "width": 300, "height": 500, "rotation": 0, "opacity": 0.15, "locked": false, "visible": true, "zIndex": 4, "shapeType": "rectangle", "fill": "#3b82f6", "strokeWidth": 0 }
+    ]
+  },
+  {
+    "id": "corp-2",
+    "name": "Minimal Pro",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corp2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#f8fafc" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 8, "height": 500, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#4f46e5", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 90, "width": 350, "height": 50, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Sarah Johnson", "fontFamily": "Inter", "fontSize": 34, "fontWeight": "700", "color": "#1e293b", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 150, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Product Manager", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "500", "color": "#4f46e5", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 340, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "sarah@company.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#64748b", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 370, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "+1 (555) 987-6543", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#64748b", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "corp-3",
+    "name": "Dark Elegance",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corp3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#0f172a" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 100, "width": 400, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Michael Chen", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#f1f5f9", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 165, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Chief Technology Officer", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#94a3b8", "textAlign": "left" },
+      { "id": "e3", "type": "shape", "x": 60, "y": 205, "width": 60, "height": 3, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#6366f1", "strokeWidth": 0 },
+      { "id": "e4", "type": "text", "x": 60, "y": 340, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "m.chen@techcorp.io", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#94a3b8", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 370, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "techcorp.io", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#6366f1", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "corp-4",
+    "name": "Green Corporate",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corp4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#ffffff" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 180, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#065f46", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 60, "width": 380, "height": 50, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Emily Williams", "fontFamily": "Inter", "fontSize": 34, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 118, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Sustainability Director", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#a7f3d0", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 240, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "e.williams@greenco.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#374151", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 275, "width": 280, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "+1 (555) 321-0987", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#374151", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "corp-5",
+    "name": "Classic Gold",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corp5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#1c1917" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 4, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#d97706", "strokeWidth": 0 },
+      { "id": "e2", "type": "shape", "x": 0, "y": 496, "width": 800, "height": 4, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "shapeType": "rectangle", "fill": "#d97706", "strokeWidth": 0 },
+      { "id": "e3", "type": "text", "x": 60, "y": 100, "width": 380, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Robert Anderson", "fontFamily": "Inter", "fontSize": 34, "fontWeight": "700", "color": "#fbbf24", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 162, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "Managing Director", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#d6d3d1", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 340, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "r.anderson@luxcorp.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#d6d3d1", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "cre-1",
+    "name": "Vibrant Artist",
+    "category": "creative",
+    "thumbnail": "https://picsum.photos/seed/cre1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 135, "stops": [{ "color": "#f093fb", "position": 0 }, { "color": "#f5576c", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 120, "width": 400, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Alex Rivera", "fontFamily": "Inter", "fontSize": 42, "fontWeight": "800", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 188, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Visual Designer & Artist", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#ffe4e6", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "alex@creativestudio.co", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e4", "type": "shape", "x": 580, "y": 50, "width": 150, "height": 150, "rotation": 15, "opacity": 0.2, "locked": false, "visible": true, "zIndex": 3, "shapeType": "circle", "fill": "#ffffff", "strokeWidth": 0 }
+    ]
+  },
+  {
+    "id": "cre-2",
+    "name": "Neon Pop",
+    "category": "creative",
+    "thumbnail": "https://picsum.photos/seed/cre2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#09090b" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 110, "width": 420, "height": 65, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Zoe Kim", "fontFamily": "Inter", "fontSize": 48, "fontWeight": "900", "color": "#e879f9", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 184, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Graphic Designer", "fontFamily": "Inter", "fontSize": 18, "fontWeight": "400", "color": "#a1a1aa", "textAlign": "left" },
+      { "id": "e3", "type": "shape", "x": 60, "y": 220, "width": 80, "height": 3, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#e879f9", "strokeWidth": 0 },
+      { "id": "e4", "type": "text", "x": 60, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "zoe@neondesigns.io", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#e879f9", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "cre-3",
+    "name": "Pastel Dream",
+    "category": "creative",
+    "thumbnail": "https://picsum.photos/seed/cre3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#fdf4ff" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 580, "y": -50, "width": 280, "height": 280, "rotation": 20, "opacity": 0.5, "locked": false, "visible": true, "zIndex": 0, "shapeType": "circle", "fill": "#f0abfc", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 120, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Luna Martinez", "fontFamily": "Inter", "fontSize": 38, "fontWeight": "700", "color": "#7c3aed", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 183, "width": 300, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Illustrator & Brand Designer", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "500", "color": "#a855f7", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 350, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "luna@pasteldreams.art", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#9333ea", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "cre-4",
+    "name": "Studio Bold",
+    "category": "creative",
+    "thumbnail": "https://picsum.photos/seed/cre4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#fef08a" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 500, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#fef08a", "stroke": "#1c1917", "strokeWidth": 8 },
+      { "id": "e2", "type": "text", "x": 60, "y": 100, "width": 500, "height": 70, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "MARCO STUDIO", "fontFamily": "Inter", "fontSize": 44, "fontWeight": "900", "color": "#1c1917", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 178, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Creative Direction", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "500", "color": "#44403c", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "hello@marcostudio.co", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "color": "#1c1917", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "cre-5",
+    "name": "Watercolor Flow",
+    "category": "creative",
+    "thumbnail": "https://picsum.photos/seed/cre5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 45, "stops": [{ "color": "#a1c4fd", "position": 0 }, { "color": "#c2e9fb", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 130, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Chloe Bennett", "fontFamily": "Inter", "fontSize": 38, "fontWeight": "700", "color": "#1e3a5f", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 193, "width": 300, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Watercolor Artist", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#1e40af", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 360, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "chloe@artbybennet.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#1e3a5f", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "min-1",
+    "name": "Pure White",
+    "category": "minimal",
+    "thumbnail": "https://picsum.photos/seed/min1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#ffffff" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 140, "width": 400, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "James Parker", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "300", "color": "#111827", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 202, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Architect", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#9ca3af", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 360, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "james@parkerarch.com", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "400", "color": "#6b7280", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "min-2",
+    "name": "Black & White",
+    "category": "minimal",
+    "thumbnail": "https://picsum.photos/seed/min2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#000000" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 140, "width": 500, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "ANNA WHITE", "fontFamily": "Inter", "fontSize": 40, "fontWeight": "100", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e2", "type": "shape", "x": 60, "y": 202, "width": 200, "height": 1, "rotation": 0, "opacity": 0.5, "locked": false, "visible": true, "zIndex": 1, "shapeType": "rectangle", "fill": "#ffffff", "strokeWidth": 0 },
+      { "id": "e3", "type": "text", "x": 60, "y": 218, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Photographer", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#9ca3af", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "anna@whiteframes.photography", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "300", "color": "#6b7280", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "min-3",
+    "name": "Warm Minimal",
+    "category": "minimal",
+    "thumbnail": "https://picsum.photos/seed/min3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#fafaf9" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 60, "y": 80, "width": 50, "height": 4, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#d97706", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 100, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Thomas Reed", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "600", "color": "#1c1917", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 163, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Interior Designer", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#78716c", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 360, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "thomas@reedinteriors.com", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "400", "color": "#a8a29e", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "min-4",
+    "name": "Slate Clean",
+    "category": "minimal",
+    "thumbnail": "https://picsum.photos/seed/min4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#f1f5f9" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 130, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Claire Dubois", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "600", "color": "#0f172a", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 192, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "UX Researcher", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#64748b", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 350, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "claire.d@research.io", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "400", "color": "#94a3b8", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "min-5",
+    "name": "Light Grid",
+    "category": "minimal",
+    "thumbnail": "https://picsum.photos/seed/min5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#fffbeb" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 130, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Noah Wilson", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "500", "color": "#1c1917", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 192, "width": 280, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Copywriter", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#92400e", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 360, "width": 300, "height": 22, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "noah@wilsonwords.com", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "400", "color": "#a16207", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "tech-1",
+    "name": "Dev Dark",
+    "category": "tech",
+    "thumbnail": "https://picsum.photos/seed/tech1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#0d1117" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 100, "width": 500, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "$ whoami: dev_kai", "fontFamily": "monospace", "fontSize": 28, "fontWeight": "400", "color": "#58d68d", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 162, "width": 400, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "// Full Stack Engineer", "fontFamily": "monospace", "fontSize": 16, "fontWeight": "400", "color": "#5d6c7a", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 350, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "kai@devspace.codes", "fontFamily": "monospace", "fontSize": 13, "fontWeight": "400", "color": "#79c0ff", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "github.com/devkai", "fontFamily": "monospace", "fontSize": 13, "fontWeight": "400", "color": "#58d68d", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "tech-2",
+    "name": "SaaS Blue",
+    "category": "tech",
+    "thumbnail": "https://picsum.photos/seed/tech2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 135, "stops": [{ "color": "#1a1a2e", "position": 0 }, { "color": "#16213e", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 110, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Priya Sharma", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#e2e8f0", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 173, "width": 320, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "ML Engineer at ScaleAI", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#63b3ed", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 350, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "priya@mlresearch.ai", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#a0aec0", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "tech-3",
+    "name": "Startup Green",
+    "category": "tech",
+    "thumbnail": "https://picsum.photos/seed/tech3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#f0fdf4" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 260, "height": 500, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#16a34a", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 320, "y": 110, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Liam Foster", "fontFamily": "Inter", "fontSize": 34, "fontWeight": "700", "color": "#14532d", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 320, "y": 173, "width": 320, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Co-founder & CTO", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "500", "color": "#16a34a", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 320, "y": 350, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "liam@greenstartup.io", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#15803d", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "tech-4",
+    "name": "Cyber Purple",
+    "category": "tech",
+    "thumbnail": "https://picsum.photos/seed/tech4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#1e1b4b" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 110, "width": 500, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "Aiden Cross", "fontFamily": "Inter", "fontSize": 40, "fontWeight": "800", "color": "#c4b5fd", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 178, "width": 350, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Security Researcher", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#8b5cf6", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 350, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "aiden@cybersec.pro", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#a78bfa", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "tech-5",
+    "name": "Data Science",
+    "category": "tech",
+    "thumbnail": "https://picsum.photos/seed/tech5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#f8fafc" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 6, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#0ea5e9", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 100, "width": 420, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Dr. Mei Zhang", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#0f172a", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 163, "width": 350, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Data Scientist, PhD", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "500", "color": "#0ea5e9", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 350, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "mei.zhang@datainstitute.org", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#64748b", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "soc-1",
+    "name": "Influencer Card",
+    "category": "social",
+    "thumbnail": "https://picsum.photos/seed/soc1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 45, "stops": [{ "color": "#ff9a9e", "position": 0 }, { "color": "#fecfef", "position": 50 }, { "color": "#ffecd2", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 110, "width": 420, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "@lifestyle_jen", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "800", "color": "#7c3aed", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 178, "width": 350, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Lifestyle & Travel Creator", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#6d28d9", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 360, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "jen@lifestylebyjen.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#5b21b6", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "soc-2",
+    "name": "YouTuber Blue",
+    "category": "social",
+    "thumbnail": "https://picsum.photos/seed/soc2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#ffffff" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 200, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#ff0000", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 60, "width": 500, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "TechWithDave", "fontFamily": "Inter", "fontSize": 40, "fontWeight": "900", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 128, "width": 350, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "YouTube Tech Creator", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#fecaca", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 270, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "collab@techwithdave.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "color": "#374151", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 300, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "2.5M Subscribers", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "color": "#dc2626", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "soc-3",
+    "name": "Podcast Host",
+    "category": "social",
+    "thumbnail": "https://picsum.photos/seed/soc3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#1c1917" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 110, "width": 500, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "The Real Talk Pod", "fontFamily": "Inter", "fontSize": 34, "fontWeight": "800", "color": "#f97316", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 178, "width": 350, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Hosted by Marcus Johnson", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#d6d3d1", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 360, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "marcus@realtalkpod.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#a8a29e", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "soc-4",
+    "name": "TikTok Creator",
+    "category": "social",
+    "thumbnail": "https://picsum.photos/seed/soc4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#010101" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 100, "width": 500, "height": 65, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "@sophiafun", "fontFamily": "Inter", "fontSize": 44, "fontWeight": "900", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 172, "width": 350, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Comedy & Dance Content", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#aaaaaa", "textAlign": "left" },
+      { "id": "e3", "type": "shape", "x": 60, "y": 212, "width": 100, "height": 4, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#fe2c55", "strokeWidth": 0 },
+      { "id": "e4", "type": "text", "x": 60, "y": 360, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "brand@sophiafun.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#888888", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "soc-5",
+    "name": "LinkedIn Pro",
+    "category": "social",
+    "thumbnail": "https://picsum.photos/seed/soc5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#ffffff" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 160, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#0077b5", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 55, "width": 500, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "David Park", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 117, "width": 400, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Sales Manager | B2B Growth Expert", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 260, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "david.park@salesforce.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#374151", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 292, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "linkedin.com/in/davidpark", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#0077b5", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "eve-1",
+    "name": "Conference Speaker",
+    "category": "event",
+    "thumbnail": "https://picsum.photos/seed/eve1/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 135, "stops": [{ "color": "#667eea", "position": 0 }, { "color": "#764ba2", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 80, "width": 600, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "TechConf 2024 — San Francisco", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "color": "#c4b5fd", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 120, "width": 500, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Dr. Lisa Nguyen", "fontFamily": "Inter", "fontSize": 40, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 188, "width": 400, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Keynote Speaker • AI & Future of Work", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#e0e7ff", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "lisa@futureworklab.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#c7d2fe", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "eve-2",
+    "name": "Wedding Planner",
+    "category": "event",
+    "thumbnail": "https://picsum.photos/seed/eve2/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#fff7f7" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 60, "y": 70, "width": 680, "height": 1, "rotation": 0, "opacity": 0.4, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#f43f5e", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 100, "width": 500, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Isabelle Laurent", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "600", "color": "#881337", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 162, "width": 350, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Wedding & Event Planner", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "400", "color": "#e11d48", "textAlign": "left" },
+      { "id": "e4", "type": "shape", "x": 60, "y": 198, "width": 680, "height": 1, "rotation": 0, "opacity": 0.4, "locked": false, "visible": true, "zIndex": 3, "shapeType": "rectangle", "fill": "#f43f5e", "strokeWidth": 0 },
+      { "id": "e5", "type": "text", "x": 60, "y": 360, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "isabelle@dreamweddings.fr", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#be123c", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "eve-3",
+    "name": "Festival Pass",
+    "category": "event",
+    "thumbnail": "https://picsum.photos/seed/eve3/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "gradient", "gradient": { "type": "linear", "angle": 135, "stops": [{ "color": "#f97316", "position": 0 }, { "color": "#eab308", "position": 100 }] } },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 90, "width": 600, "height": 65, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "SUMMER VIBES FEST", "fontFamily": "Inter", "fontSize": 42, "fontWeight": "900", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 162, "width": 400, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Production Team", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "500", "color": "#fef3c7", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 200, "width": 350, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Jake Morrison", "fontFamily": "Inter", "fontSize": 22, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "jake@summervibefest.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#fef9c3", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "eve-4",
+    "name": "Corporate Event",
+    "category": "event",
+    "thumbnail": "https://picsum.photos/seed/eve4/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#f8fafc" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 800, "height": 8, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#1e40af", "strokeWidth": 0 },
+      { "id": "e2", "type": "text", "x": 60, "y": 80, "width": 600, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "ANNUAL SUMMIT 2024", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "600", "color": "#1e40af", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 120, "width": 500, "height": 55, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Rachel Stone", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#0f172a", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 183, "width": 350, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "Event Director", "fontFamily": "Inter", "fontSize": 15, "fontWeight": "500", "color": "#3b82f6", "textAlign": "left" },
+      { "id": "e5", "type": "text", "x": 60, "y": 360, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "rachel@annualsummit.com", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#64748b", "textAlign": "left" }
+    ]
+  },
+  {
+    "id": "eve-5",
+    "name": "Music Tour",
+    "category": "event",
+    "thumbnail": "https://picsum.photos/seed/eve5/400/250",
+    "width": 800,
+    "height": 500,
+    "background": { "type": "solid", "color": "#0c0a09" },
+    "elements": [
+      { "id": "e1", "type": "text", "x": 60, "y": 80, "width": 600, "height": 70, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "ECHO & THE WAVES", "fontFamily": "Inter", "fontSize": 40, "fontWeight": "900", "color": "#fbbf24", "textAlign": "left" },
+      { "id": "e2", "type": "text", "x": 60, "y": 158, "width": 400, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "World Tour 2024 — Press Contact", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#a8a29e", "textAlign": "left" },
+      { "id": "e3", "type": "text", "x": 60, "y": 220, "width": 350, "height": 36, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Sam Torres, Manager", "fontFamily": "Inter", "fontSize": 22, "fontWeight": "700", "color": "#e7e5e4", "textAlign": "left" },
+      { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "sam@echowaves.music", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#fbbf24", "textAlign": "left" }
+    ]
+  }
+]
