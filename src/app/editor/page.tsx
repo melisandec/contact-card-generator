@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { Suspense, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Canvas } from '@/components/editor/Canvas';
 import { Sidebar } from '@/components/editor/Sidebar';
 import { PropertiesPanel } from '@/components/editor/PropertiesPanel';
@@ -8,12 +9,44 @@ import { Toolbar } from '@/components/editor/Toolbar';
 import { ExportModal } from '@/components/editor/ExportModal';
 import { useDesignStore } from '@/store/design-store';
 import { useUIStore } from '@/store/ui-store';
+import { useDesign } from '@/hooks/useDesign';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
-export default function EditorPage() {
+function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const { zoom, setZoom, undo, redo } = useDesignStore();
+  const {
+    zoom, setZoom, undo, redo, loadDesign, loadFullDesign, setCurrentDesignId,
+    currentSide, setCurrentSide, isDoubleSided,
+  } = useDesignStore();
   const { exportModalOpen } = useUIStore();
+  const searchParams = useSearchParams();
+  const designId = searchParams.get('id');
+  const { design, isLoading: isDesignLoading } = useDesign(designId ?? '');
+
+  // Load design from URL query param
+  useEffect(() => {
+    if (design && designId) {
+      if (design.frontLayers) {
+        loadFullDesign({
+          id: design.id,
+          frontLayers: design.frontLayers,
+          backLayers: design.backLayers || [],
+          isDoubleSided: design.isDoubleSided,
+          width: design.width,
+          height: design.height,
+        });
+      } else if (design.data) {
+        setCurrentDesignId(design.id);
+        loadDesign(
+          design.data.elements || [],
+          design.data.background || { type: 'solid', color: '#ffffff' },
+          design.width,
+          design.height
+        );
+      }
+    }
+  }, [design, designId, loadDesign, loadFullDesign, setCurrentDesignId]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -42,6 +75,15 @@ export default function EditorPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [zoom, setZoom, undo, redo]);
+
+  if (designId && isDesignLoading) {
+    return (
+      <div className="flex flex-col h-screen overflow-hidden bg-slate-50 items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+        <p className="text-sm text-slate-500 mt-3">Loading design...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-50">
@@ -80,8 +122,25 @@ export default function EditorPage() {
   );
 }
 
+export default function EditorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col h-screen overflow-hidden bg-slate-50 items-center justify-center">
+          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+        </div>
+      }
+    >
+      <EditorContent />
+    </Suspense>
+  );
+}
+
 function StatusBarInfo() {
-  const { elements, selectedElementId, canvasWidth, canvasHeight, zoom } = useDesignStore();
+  const {
+    elements, selectedElementId, canvasWidth, canvasHeight, zoom,
+    currentSide, setCurrentSide, isDoubleSided,
+  } = useDesignStore();
   const selected = elements.find((e) => e.id === selectedElementId);
 
   return (
@@ -97,6 +156,35 @@ function StatusBarInfo() {
           <span className="text-indigo-600">
             {selected.type} — x:{selected.x} y:{selected.y}
           </span>
+        </>
+      )}
+      {isDoubleSided && (
+        <>
+          <span>•</span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentSide('front')}
+              className={cn(
+                'px-2 py-0.5 rounded text-xs font-medium transition-colors',
+                currentSide === 'front'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'text-slate-400 hover:text-slate-600'
+              )}
+            >
+              Front
+            </button>
+            <button
+              onClick={() => setCurrentSide('back')}
+              className={cn(
+                'px-2 py-0.5 rounded text-xs font-medium transition-colors',
+                currentSide === 'back'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'text-slate-400 hover:text-slate-600'
+              )}
+            >
+              Back
+            </button>
+          </div>
         </>
       )}
     </>
