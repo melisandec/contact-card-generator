@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const buffer = await QRCode.toBuffer(data, { width: 200, margin: 1 });
-    return new NextResponse(buffer, {
+    return new NextResponse(Buffer.from(buffer) as unknown as BodyInit, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=86400',
