@@ -121,7 +121,7 @@ export default function HomePage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-sm mb-8">
               <Sparkles className="w-4 h-4" />
-              <span>Now with AI-powered suggestions</span>
+              <span>Simple, fast, and free to use</span>
             </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight">
               Create stunning{' '}
