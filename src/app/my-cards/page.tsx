@@ -5,14 +5,12 @@ import Link from 'next/link';
 import { useDesigns, duplicateDesign, deleteDesign } from '@/hooks/useDesign';
 import { DesignCard } from '@/components/my-cards/DesignCard';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Header } from '@/components/layout/Header';
 import {
   Search,
   Plus,
   LayoutGrid,
   List,
-  SortAsc,
   Layers,
   Loader2,
   Pencil,
