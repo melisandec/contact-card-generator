@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -14,10 +14,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   const userId = (session.user as { id?: string }).id;
+  const { id } = await params;
 
   try {
     const design = await prisma.design.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!design) {
@@ -46,9 +47,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await params;
+
   try {
     const design = await prisma.design.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!design) {
@@ -63,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { name, data, width, height, thumbnail, isPublic } = body;
 
     const updated = await prisma.design.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name !== undefined && { name }),
         ...(data !== undefined && { data }),
@@ -92,9 +95,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await params;
+
   try {
     const design = await prisma.design.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!design) {
@@ -105,7 +110,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    await prisma.design.delete({ where: { id: params.id } });
+    await prisma.design.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
