@@ -76,13 +76,20 @@ export interface Template {
 export interface Design {
   id: string;
   name: string;
+  description?: string;
   thumbnail?: string;
+  thumbnailUrl?: string;
   data: {
     elements: DesignElement[];
     background: CanvasBackground;
   };
+  frontLayers?: DesignElement[];
+  backLayers?: DesignElement[];
+  isDoubleSided: boolean;
   width: number;
   height: number;
+  templateId?: string;
+  tags: string[];
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;

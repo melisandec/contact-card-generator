@@ -64,16 +64,23 @@ model VerificationToken {
 }
 
 model Design {
-  id        String   @id @default(cuid())
-  name      String
-  thumbnail String?
-  data      Json
-  width     Int      @default(800)
-  height    Int      @default(500)
-  isPublic  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  thumbnail     String?
+  thumbnailUrl  String?
+  data          Json
+  frontLayers   Json?
+  backLayers    Json?
+  isDoubleSided Boolean  @default(false)
+  width         Int      @default(1050)
+  height        Int      @default(600)
+  templateId    String?
+  tags          String[] @default([])
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        String
 
   // QR Contact fields
   qrSettings Json?
@@ -82,6 +89,9 @@ model Design {
   lastQRSync DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([updatedAt])
 }
 
 model Asset {

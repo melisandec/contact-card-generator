@@ -8,6 +8,9 @@ interface HistoryEntry {
 }
 
 interface DesignState {
+  // Current design ID (for re-edit)
+  currentDesignId: string | null;
+
   elements: DesignElement[];
   selectedElementId: string | null;
   background: CanvasBackground;
@@ -17,6 +20,14 @@ interface DesignState {
   history: HistoryEntry[];
   historyIndex: number;
   isDirty: boolean;
+
+  // Double-sided support
+  frontLayers: DesignElement[];
+  backLayers: DesignElement[];
+  frontBackground: CanvasBackground;
+  backBackground: CanvasBackground;
+  currentSide: 'front' | 'back';
+  isDoubleSided: boolean;
 
   // Actions
   addElement: (element: Omit<DesignElement, 'id'>) => void;
@@ -33,6 +44,21 @@ interface DesignState {
   redo: () => void;
   clearCanvas: () => void;
   loadDesign: (elements: DesignElement[], background: CanvasBackground, width: number, height: number) => void;
+
+  // Double-sided actions
+  setCurrentSide: (side: 'front' | 'back') => void;
+  setIsDoubleSided: (isDoubleSided: boolean) => void;
+  setCurrentDesignId: (id: string | null) => void;
+  loadFullDesign: (design: {
+    id?: string;
+    frontLayers: DesignElement[];
+    backLayers?: DesignElement[];
+    frontBackground?: CanvasBackground;
+    backBackground?: CanvasBackground;
+    isDoubleSided: boolean;
+    width: number;
+    height: number;
+  }) => void;
 }
 
 const defaultBackground: CanvasBackground = {
@@ -45,11 +71,20 @@ export const useDesignStore = create<DesignState>()((set) => ({
     selectedElementId: null,
     background: defaultBackground,
     zoom: 1,
-    canvasWidth: 800,
-    canvasHeight: 500,
+    canvasWidth: 1050,
+    canvasHeight: 600,
     history: [{ elements: [], background: defaultBackground }],
     historyIndex: 0,
     isDirty: false,
+
+    // Double-sided state
+    currentDesignId: null,
+    frontLayers: [],
+    backLayers: [],
+    frontBackground: defaultBackground,
+    backBackground: defaultBackground,
+    currentSide: 'front' as const,
+    isDoubleSided: false,
 
     addElement: (elementData) =>
       set((state) => {
@@ -217,6 +252,50 @@ export const useDesignStore = create<DesignState>()((set) => ({
         canvasHeight: height,
         selectedElementId: null,
         history: [{ elements: JSON.parse(JSON.stringify(elements)), background: JSON.parse(JSON.stringify(background)) }],
+        historyIndex: 0,
+        isDirty: false,
+      }),
+
+    // Double-sided actions
+    setCurrentSide: (side) =>
+      set((state) => {
+        // Save current side's layers before switching
+        const updates: Partial<DesignState> = { currentSide: side, selectedElementId: null };
+        if (state.currentSide === 'front') {
+          updates.frontLayers = [...state.elements];
+          updates.frontBackground = { ...state.background };
+          updates.elements = [...state.backLayers];
+          updates.background = { ...state.backBackground };
+        } else {
+          updates.backLayers = [...state.elements];
+          updates.backBackground = { ...state.background };
+          updates.elements = [...state.frontLayers];
+          updates.background = { ...state.frontBackground };
+        }
+        updates.history = [{ elements: JSON.parse(JSON.stringify(updates.elements)), background: JSON.parse(JSON.stringify(updates.background)) }];
+        updates.historyIndex = 0;
+        return updates as DesignState;
+      }),
+
+    setIsDoubleSided: (isDoubleSided) => set({ isDoubleSided, isDirty: true }),
+
+    setCurrentDesignId: (id) => set({ currentDesignId: id }),
+
+    loadFullDesign: (design) =>
+      set({
+        currentDesignId: design.id || null,
+        frontLayers: design.frontLayers,
+        backLayers: design.backLayers || [],
+        frontBackground: design.frontBackground || defaultBackground,
+        backBackground: design.backBackground || defaultBackground,
+        isDoubleSided: design.isDoubleSided,
+        elements: design.frontLayers,
+        background: design.frontBackground || defaultBackground,
+        currentSide: 'front' as const,
+        canvasWidth: design.width,
+        canvasHeight: design.height,
+        selectedElementId: null,
+        history: [{ elements: JSON.parse(JSON.stringify(design.frontLayers)), background: JSON.parse(JSON.stringify(design.frontBackground || defaultBackground)) }],
         historyIndex: 0,
         isDirty: false,
       }),

@@ -18,6 +18,9 @@ export function Header() {
         <Link href="/editor" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
           Editor
         </Link>
+        <Link href="/my-cards" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+          My Cards
+        </Link>
         <Link href="#" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
           Templates
         </Link>
