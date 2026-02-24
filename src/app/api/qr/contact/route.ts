@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
       size: qrString.length,
     });
   } catch (error) {
-    console.error('QR contact generation error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('QR contact generation error:', message);
     return NextResponse.json(
       { error: 'Failed to generate QR contact code' },
       { status: 500 }

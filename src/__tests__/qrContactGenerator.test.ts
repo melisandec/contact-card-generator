@@ -110,6 +110,28 @@ describe('QRContactGenerator', () => {
       expect(vcard).toContain('FN:José María García');
     });
 
+    it('escapes special characters in notes', () => {
+      const contact: ContactData = {
+        fullName: 'Test',
+        notes: 'Line 1\nLine 2; with semicolons, commas',
+      };
+      const generator = new QRContactGenerator(contact);
+      const vcard = generator.generateVCard();
+
+      expect(vcard).toContain('NOTE:Line 1\\nLine 2\\; with semicolons\\, commas');
+    });
+
+    it('escapes special characters in custom fields', () => {
+      const contact: ContactData = {
+        fullName: 'Test',
+        customFields: [{ label: 'Info', value: 'a;b,c\nd' }],
+      };
+      const generator = new QRContactGenerator(contact);
+      const vcard = generator.generateVCard();
+
+      expect(vcard).toContain('X-INFO:a\\;b\\,c\\nd');
+    });
+
     it('omits social media without URL', () => {
       const contact: ContactData = {
         fullName: 'Test',

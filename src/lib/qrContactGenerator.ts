@@ -1,5 +1,13 @@
 import type { ContactData, QRContactOptions } from '@/types';
 
+function escapeVCardText(text: string): string {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
 const defaultOptions: QRContactOptions = {
   format: 'vcard',
   encoding: 'UTF-8',
@@ -95,7 +103,7 @@ export class QRContactGenerator {
     }
 
     if (contactData.notes) {
-      vcard += `NOTE:${contactData.notes}\r\n`;
+      vcard += `NOTE:${escapeVCardText(contactData.notes)}\r\n`;
     }
 
     if (contactData.photo) {
@@ -107,7 +115,7 @@ export class QRContactGenerator {
     }
 
     contactData.customFields?.forEach((field) => {
-      vcard += `X-${field.label.toUpperCase().replace(/\s+/g, '-')}:${field.value}\r\n`;
+      vcard += `X-${field.label.toUpperCase().replace(/\s+/g, '-')}:${escapeVCardText(field.value)}\r\n`;
     });
 
     vcard += 'END:VCARD\r\n';
