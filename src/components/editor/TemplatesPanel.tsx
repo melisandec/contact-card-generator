@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import type { Template } from '@/types';
 
-const CATEGORIES = ['all', 'corporate', 'creative', 'minimal', 'tech', 'social', 'event'];
+const CATEGORIES = ['all', 'corporate', 'creative', 'minimal', 'tech', 'social', 'event', 'real-estate'];
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 

@@ -449,5 +449,54 @@
       { "id": "e3", "type": "text", "x": 60, "y": 220, "width": 350, "height": 36, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "Sam Torres, Manager", "fontFamily": "Inter", "fontSize": 22, "fontWeight": "700", "color": "#e7e5e4", "textAlign": "left" },
       { "id": "e4", "type": "text", "x": 60, "y": 380, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "sam@echowaves.music", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "400", "color": "#fbbf24", "textAlign": "left" }
     ]
+  },
+  {
+    "id": "luxury-realty-double-01",
+    "name": "Luxury Estates Double-Sided",
+    "category": "real-estate",
+    "thumbnail": "https://picsum.photos/seed/luxrealty1/400/250",
+    "width": 1050,
+    "height": 600,
+    "background": { "type": "solid", "color": "#FFFFFF" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 1050, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#003153", "strokeWidth": 0 },
+      { "id": "e2", "type": "shape", "x": 0, "y": 560, "width": 1050, "height": 40, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "shapeType": "rectangle", "fill": "#003153", "strokeWidth": 0 },
+      { "id": "e3", "type": "shape", "x": 0, "y": 64, "width": 1050, "height": 2, "rotation": 0, "opacity": 0.8, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#C5A572", "strokeWidth": 0 },
+      { "id": "e4", "type": "text", "x": 80, "y": 140, "width": 600, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "AGENT FULL NAME", "fontFamily": "Cormorant Garamond", "fontSize": 48, "fontWeight": "600", "color": "#003153", "textAlign": "left", "letterSpacing": 2 },
+      { "id": "e5", "type": "text", "x": 80, "y": 200, "width": 600, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "LUXURY REAL ESTATE SPECIALIST", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#C5A572", "textAlign": "left", "letterSpacing": 1.5 },
+      { "id": "e6", "type": "text", "x": 80, "y": 280, "width": 400, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 5, "content": "+1 123 456 7890", "fontFamily": "Montserrat", "fontSize": 20, "fontWeight": "500", "color": "#003153", "textAlign": "left" },
+      { "id": "e7", "type": "text", "x": 80, "y": 330, "width": 600, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 6, "content": "WATERFRONT ESTATES · PENTHOUSES · INVESTMENT PORTFOLIOS", "fontFamily": "Montserrat", "fontSize": 12, "fontWeight": "400", "color": "#4A5568", "textAlign": "left", "letterSpacing": 1 },
+      { "id": "e8", "type": "text", "x": 80, "y": 380, "width": 400, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 7, "content": "agent@example.com", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#003153", "textAlign": "left" },
+      { "id": "e9", "type": "text", "x": 80, "y": 410, "width": 400, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 8, "content": "www.example.com", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "500", "color": "#C5A572", "textAlign": "left" },
+      { "id": "e10", "type": "text", "x": 80, "y": 470, "width": 500, "height": 28, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 9, "content": "Serving City's Finest Properties", "fontFamily": "Cormorant Garamond", "fontSize": 18, "fontWeight": "400", "fontStyle": "italic", "color": "#003153", "textAlign": "left" },
+      { "id": "e11", "type": "text", "x": 80, "y": 520, "width": 600, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 10, "content": "AREA1 · AREA2 · AREA3 · AREA4 · AREA5 · AREA6", "fontFamily": "Montserrat", "fontSize": 10, "fontWeight": "400", "color": "#718096", "textAlign": "left", "letterSpacing": 0.5, "lineHeight": 1.4 },
+      { "id": "e12", "type": "text", "x": 850, "y": 40, "width": 160, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 11, "content": "COMPANY NAME", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "600", "color": "#C5A572", "textAlign": "left" },
+      { "id": "e13", "type": "shape", "x": 40, "y": 100, "width": 1, "height": 450, "rotation": 0, "opacity": 0.6, "locked": false, "visible": true, "zIndex": 12, "shapeType": "line", "fill": "#C5A572", "stroke": "#C5A572", "strokeWidth": 1 }
+    ]
+  },
+  {
+    "id": "luxury-realty-skyline-02",
+    "name": "Miami Skyline Luxury",
+    "category": "real-estate",
+    "thumbnail": "https://picsum.photos/seed/luxrealty2/400/250",
+    "width": 1050,
+    "height": 600,
+    "background": { "type": "solid", "color": "#F5F5F5" },
+    "elements": [
+      { "id": "e1", "type": "shape", "x": 0, "y": 0, "width": 450, "height": 600, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "shapeType": "rectangle", "fill": "#0A1C2F", "strokeWidth": 0 },
+      { "id": "e2", "type": "shape", "x": 450, "y": 0, "width": 600, "height": 600, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "shapeType": "rectangle", "fill": "#F5F5F5", "strokeWidth": 0 },
+      { "id": "e3", "type": "text", "x": 60, "y": 150, "width": 380, "height": 65, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "content": "AGENT FULL NAME", "fontFamily": "Playfair Display", "fontSize": 52, "fontWeight": "700", "color": "#FFFFFF", "textAlign": "left", "letterSpacing": 1 },
+      { "id": "e4", "type": "text", "x": 60, "y": 220, "width": 350, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "LUXURY REAL ESTATE", "fontFamily": "Montserrat", "fontSize": 16, "fontWeight": "300", "color": "#C5A572", "textAlign": "left", "letterSpacing": 3 },
+      { "id": "e5", "type": "text", "x": 60, "y": 260, "width": 380, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "MIAMI BEACH · SUNNY ISLES · AVENTURA", "fontFamily": "Montserrat", "fontSize": 12, "fontWeight": "400", "color": "#FFFFFF", "textAlign": "left" },
+      { "id": "e6", "type": "text", "x": 60, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 5, "content": "📞 +1 123 456 7890", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#FFFFFF", "textAlign": "left" },
+      { "id": "e7", "type": "text", "x": 60, "y": 375, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 6, "content": "✉️ agent@example.com", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#FFFFFF", "textAlign": "left" },
+      { "id": "e8", "type": "text", "x": 60, "y": 400, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 7, "content": "📍 Miami, Florida", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#FFFFFF", "textAlign": "left" },
+      { "id": "e9", "type": "text", "x": 600, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 8, "content": "🌐 www.example.com", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#0A1C2F", "textAlign": "left" },
+      { "id": "e10", "type": "text", "x": 600, "y": 375, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 9, "content": "@socialhandle", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "400", "color": "#0A1C2F", "textAlign": "left" },
+      { "id": "e11", "type": "shape", "x": 600, "y": 400, "width": 100, "height": 100, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 10, "shapeType": "rectangle", "fill": "#FFFFFF", "stroke": "#C5A572", "strokeWidth": 2 },
+      { "id": "e12", "type": "text", "x": 600, "y": 510, "width": 100, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 11, "content": "SCAN TO CONNECT", "fontFamily": "Montserrat", "fontSize": 10, "fontWeight": "400", "color": "#0A1C2F", "textAlign": "center", "letterSpacing": 1.5 },
+      { "id": "e13", "type": "text", "x": 60, "y": 550, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 12, "content": "COMPANY NAME", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "600", "color": "#C5A572", "textAlign": "left" },
+      { "id": "e14", "type": "text", "x": 600, "y": 550, "width": 350, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 13, "content": "INTERNATIONAL BUYER REPRESENTATION", "fontFamily": "Montserrat", "fontSize": 10, "fontWeight": "400", "color": "#718096", "textAlign": "left", "letterSpacing": 1 }
+    ]
   }
 ]
