@@ -5,13 +5,14 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { useUIStore } from '@/store/ui-store';
 import { useDesignStore } from '@/store/design-store';
-import { Download, Image, FileType } from 'lucide-react';
+import { Download, Image, FileType, Printer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const FORMATS = [
   { id: 'png', label: 'PNG', description: 'Best for web, transparent background', icon: Image },
   { id: 'jpg', label: 'JPG', description: 'Smaller file size, no transparency', icon: Image },
   { id: 'pdf', label: 'PDF', description: 'Perfect for printing', icon: FileType },
+  { id: 'print-pdf', label: 'Print Sheet', description: 'Front & back on one page', icon: Printer },
 ] as const;
 
 type ExportFormat = typeof FORMATS[number]['id'];
@@ -59,7 +60,7 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
       const frontCanvas = await captureCanvas(html2canvas);
 
       let backCanvas: HTMLCanvasElement | null = null;
-      if (isDoubleSided && includeBackSide) {
+      if (isDoubleSided && (includeBackSide || format === 'print-pdf')) {
         // Switch to back and capture
         setCurrentSide('back');
         await new Promise((r) => setTimeout(r, 100));
@@ -106,6 +107,36 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
         }
 
         pdf.save('cardcrafter-design.pdf');
+      } else if (format === 'print-pdf') {
+        const { jsPDF } = await import('jspdf');
+        // Print sheet: front and back stacked vertically on one page
+        const gap = 40;
+        const pageWidth = canvasWidth;
+        const pageHeight = canvasHeight * 2 + gap * 3;
+        const pdf = new jsPDF({
+          orientation: pageWidth > pageHeight ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [pageWidth, pageHeight],
+        });
+
+        // Front label
+        pdf.setFontSize(12);
+        pdf.setTextColor(100);
+        pdf.text('Front', pageWidth / 2, gap / 2 + 6, { align: 'center' });
+
+        // Front side
+        const frontImgData = frontCanvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(frontImgData, 'JPEG', 0, gap, canvasWidth, canvasHeight);
+
+        if (backCanvas) {
+          // Back label
+          pdf.text('Back', pageWidth / 2, canvasHeight + gap * 1.5 + 6, { align: 'center' });
+          // Back side
+          const backImgData = backCanvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(backImgData, 'JPEG', 0, canvasHeight + gap * 2, canvasWidth, canvasHeight);
+        }
+
+        pdf.save('cardcrafter-print-sheet.pdf');
       }
 
       setExportModalOpen(false);
@@ -116,6 +147,8 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
       setIsExporting(false);
     }
   };
+
+  const displayFormat = format === 'print-pdf' ? 'PRINT PDF' : format.toUpperCase();
 
   return (
     <Modal
@@ -128,8 +161,8 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
         {/* Format selection */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Format</label>
-          <div className="grid grid-cols-3 gap-2">
-            {FORMATS.map(({ id, label, description, icon: Icon }) => (
+          <div className={cn('grid gap-2', isDoubleSided ? 'grid-cols-4' : 'grid-cols-3')}>
+            {FORMATS.filter((f) => isDoubleSided || f.id !== 'print-pdf').map(({ id, label, description, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setFormat(id)}
@@ -172,8 +205,8 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           <p className="text-xs text-slate-400 mt-1">Higher resolution for print quality</p>
         </div>
 
-        {/* Include back side checkbox — only for double-sided designs */}
-        {isDoubleSided && (
+        {/* Include back side checkbox — only for double-sided designs and non-print-pdf */}
+        {isDoubleSided && format !== 'print-pdf' && (
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -191,6 +224,13 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           </div>
         )}
 
+        {/* Print-sheet info */}
+        {format === 'print-pdf' && (
+          <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-xs text-indigo-700">
+            Both front and back will be placed on a single PDF page, ready for double‑sided printing.
+          </div>
+        )}
+
         <Button
           className="w-full"
           size="lg"
@@ -198,7 +238,7 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           loading={isExporting}
           leftIcon={<Download className="w-5 h-5" />}
         >
-          {isExporting ? 'Exporting...' : `Export as ${format.toUpperCase()}`}
+          {isExporting ? 'Exporting...' : `Export as ${displayFormat}`}
         </Button>
       </div>
     </Modal>

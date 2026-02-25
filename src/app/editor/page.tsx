@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [rightPanelTab, setRightPanelTab] = useState<'properties' | 'globalStyles'>('properties');
+  const [splitView, setSplitView] = useState(false);
   const {
     zoom, setZoom, undo, redo, loadDesign, loadFullDesign, setCurrentDesignId,
     currentSide, setCurrentSide, isDoubleSided,
@@ -95,7 +96,7 @@ function EditorContent() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-50">
       {/* Top toolbar */}
-      <Toolbar />
+      <Toolbar splitView={splitView} onToggleSplitView={() => setSplitView((v) => !v)} />
 
       {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
@@ -104,7 +105,7 @@ function EditorContent() {
 
         {/* Canvas */}
         <main className="flex-1 overflow-hidden relative">
-          <Canvas exportRef={canvasRef} />
+          <Canvas exportRef={canvasRef} splitView={splitView} />
 
           {/* Status bar */}
           <div className="absolute bottom-0 left-0 right-0 h-7 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center px-3 gap-4 text-xs text-slate-500">

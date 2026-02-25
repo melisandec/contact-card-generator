@@ -14,12 +14,23 @@ import {
   ChevronDown,
   FlipHorizontal2,
   ArrowRightLeft,
+  Copy,
+  Columns2,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
 
-export function Toolbar() {
-  const { zoom, setZoom, undo, redo, clearCanvas, historyIndex, history, currentSide, setCurrentSide, isDoubleSided, copyStylesToSide } = useDesignStore();
+interface ToolbarProps {
+  splitView?: boolean;
+  onToggleSplitView?: () => void;
+}
+
+export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
+  const {
+    zoom, setZoom, undo, redo, clearCanvas, historyIndex, history,
+    currentSide, setCurrentSide, isDoubleSided,
+    copyStylesToSide, copyFrontToBack, mirrorFrontToBack,
+  } = useDesignStore();
   const { setExportModalOpen, setSaveModalOpen } = useUIStore();
 
   const canUndo = historyIndex > 0;
@@ -117,15 +128,54 @@ export function Toolbar() {
           >
             <FlipHorizontal2 className="w-4 h-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => copyStylesToSide()}
-            title="Copy styles to other side"
-          >
-            <ArrowRightLeft className="w-4 h-4" />
-            <span className="text-xs ml-1">Copy styles</span>
-          </Button>
+
+          {/* Copy / Mirror / Split-view */}
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <Button variant="ghost" size="sm" title="Side actions">
+                <Copy className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3 ml-0.5" />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                className="min-w-[180px] bg-white rounded-xl shadow-xl border border-slate-200 p-1 z-50 text-sm"
+                sideOffset={4}
+              >
+                <DropdownMenu.Item
+                  className="px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer text-slate-700 outline-none"
+                  onClick={() => copyFrontToBack()}
+                >
+                  Copy front to back
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  className="px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer text-slate-700 outline-none"
+                  onClick={() => mirrorFrontToBack()}
+                >
+                  Mirror front on back
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  className="px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer text-slate-700 outline-none"
+                  onClick={() => copyStylesToSide()}
+                >
+                  <ArrowRightLeft className="w-3.5 h-3.5 inline mr-1.5" />
+                  Copy styles to other side
+                </DropdownMenu.Item>
+                {onToggleSplitView && (
+                  <>
+                    <DropdownMenu.Separator className="h-px bg-slate-100 my-1" />
+                    <DropdownMenu.Item
+                      className="px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer text-slate-700 outline-none"
+                      onClick={onToggleSplitView}
+                    >
+                      <Columns2 className="w-3.5 h-3.5 inline mr-1.5" />
+                      {splitView ? 'Hide split view' : 'Show split view'}
+                    </DropdownMenu.Item>
+                  </>
+                )}
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
         </>
       )}
 

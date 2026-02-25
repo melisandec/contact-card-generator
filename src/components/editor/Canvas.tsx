@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDesignStore, resolveElementStyles } from '@/store/design-store';
-import { DesignElement } from '@/types';
+import { DesignElement, CanvasBackground } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface CanvasElementProps {
@@ -184,87 +184,227 @@ function CanvasElement({ element, isSelected, zoom, onSelect, onUpdate }: Canvas
   );
 }
 
-interface CanvasProps {
-  exportRef?: React.RefObject<HTMLDivElement>;
+function getBackgroundCss(background: CanvasBackground): React.CSSProperties {
+  if (background.type === 'solid') {
+    return { backgroundColor: background.color ?? '#ffffff' };
+  }
+  if (background.type === 'gradient' && background.gradient) {
+    const { type, angle, stops } = background.gradient;
+    const stopsStr = stops.map((s) => `${s.color} ${s.position}%`).join(', ');
+    if (type === 'linear') {
+      return { backgroundImage: `linear-gradient(${angle ?? 135}deg, ${stopsStr})` };
+    } else {
+      return { backgroundImage: `radial-gradient(circle, ${stopsStr})` };
+    }
+  }
+  if (background.type === 'image' && background.imageUrl) {
+    return {
+      backgroundImage: `url(${background.imageUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  }
+  return { backgroundColor: '#ffffff' };
 }
 
-export function Canvas({ exportRef }: CanvasProps) {
-  const { elements, selectedElementId, background, zoom, canvasWidth, canvasHeight, selectElement, updateElement, currentSide, isDoubleSided, globalStyles } =
-    useDesignStore();
+/* Read-only preview of a side (used in split view) */
+function CanvasPreview({
+  elements,
+  background,
+  width,
+  height,
+  label,
+  isActive,
+  onClick,
+}: {
+  elements: DesignElement[];
+  background: CanvasBackground;
+  width: number;
+  height: number;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const { globalStyles } = useDesignStore();
+  const scale = 0.35;
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <span className={cn('text-[10px] font-semibold uppercase tracking-wider', isActive ? 'text-indigo-600' : 'text-slate-400')}>
+        {label}
+      </span>
+      <div
+        onClick={onClick}
+        className={cn(
+          'cursor-pointer rounded-lg overflow-hidden border-2 transition-all hover:shadow-md',
+          isActive ? 'border-indigo-500 shadow-md' : 'border-slate-200'
+        )}
+        style={{ width: width * scale, height: height * scale }}
+      >
+        <div
+          style={{
+            width,
+            height,
+            position: 'relative',
+            overflow: 'hidden',
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            ...getBackgroundCss(background),
+          }}
+        >
+          {elements.map((el) => {
+            const resolved = resolveElementStyles(el, globalStyles);
+            return (
+              <div
+                key={el.id}
+                style={{
+                  position: 'absolute',
+                  left: resolved.x,
+                  top: resolved.y,
+                  width: resolved.width,
+                  height: resolved.height,
+                  transform: `rotate(${resolved.rotation ?? 0}deg)`,
+                  opacity: resolved.opacity ?? 1,
+                  display: resolved.visible ? undefined : 'none',
+                  backgroundColor:
+                    resolved.type === 'shape' ? resolved.fill ?? '#6366f1' : undefined,
+                  borderRadius:
+                    resolved.type === 'shape' && resolved.shapeType === 'circle' ? '50%' : resolved.borderRadius ?? 0,
+                  overflow: 'hidden',
+                  fontSize: resolved.fontSize ?? 16,
+                  fontFamily: resolved.fontFamily ?? 'Inter',
+                  color: resolved.color ?? '#000000',
+                  fontWeight: resolved.fontWeight ?? '400',
+                  textAlign: resolved.textAlign ?? 'left',
+                  lineHeight: resolved.lineHeight ?? 1.4,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {resolved.type === 'text' && (resolved.content ?? 'Text')}
+                {resolved.type === 'image' && resolved.src && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={resolved.src} alt="" style={{ width: '100%', height: '100%', objectFit: resolved.objectFit ?? 'cover' }} draggable={false} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const getBackgroundStyle = (): React.CSSProperties => {
-    if (background.type === 'solid') {
-      return { backgroundColor: background.color ?? '#ffffff' };
-    }
-    if (background.type === 'gradient' && background.gradient) {
-      const { type, angle, stops } = background.gradient;
-      const stopsStr = stops.map((s) => `${s.color} ${s.position}%`).join(', ');
-      if (type === 'linear') {
-        return { backgroundImage: `linear-gradient(${angle ?? 135}deg, ${stopsStr})` };
-      } else {
-        return { backgroundImage: `radial-gradient(circle, ${stopsStr})` };
-      }
-    }
-    if (background.type === 'image' && background.imageUrl) {
-      return {
-        backgroundImage: `url(${background.imageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      };
-    }
-    return { backgroundColor: '#ffffff' };
-  };
+interface CanvasProps {
+  exportRef?: React.RefObject<HTMLDivElement>;
+  splitView?: boolean;
+}
+
+export function Canvas({ exportRef, splitView }: CanvasProps) {
+  const {
+    elements, selectedElementId, background, zoom, canvasWidth, canvasHeight,
+    selectElement, updateElement, currentSide, isDoubleSided, globalStyles,
+    frontLayers, backLayers, frontBackground, backBackground, setCurrentSide,
+  } = useDesignStore();
+
+  const [flipKey, setFlipKey] = useState(currentSide);
+
+  // Track side changes for flip animation
+  useEffect(() => {
+    setFlipKey(currentSide);
+  }, [currentSide]);
 
   const canvasStyle: React.CSSProperties = {
     width: canvasWidth,
     height: canvasHeight,
     position: 'relative',
     overflow: 'hidden',
-    ...getBackgroundStyle(),
+    ...getBackgroundCss(background),
   };
+
+  // Determine the elements for the inactive side (for split-view preview)
+  const previewFrontElements = currentSide === 'front' ? elements : frontLayers;
+  const previewBackElements = currentSide === 'back' ? elements : backLayers;
+  const previewFrontBg = currentSide === 'front' ? background : frontBackground;
+  const previewBackBg = currentSide === 'back' ? background : backBackground;
 
   return (
     <div className="flex-1 canvas-workspace flex items-center justify-center overflow-auto p-8">
+      {/* Split-view previews on the left */}
+      {isDoubleSided && splitView && (
+        <div className="flex flex-col gap-4 mr-6 flex-shrink-0">
+          <CanvasPreview
+            elements={previewFrontElements}
+            background={previewFrontBg}
+            width={canvasWidth}
+            height={canvasHeight}
+            label="Front"
+            isActive={currentSide === 'front'}
+            onClick={() => setCurrentSide('front')}
+          />
+          <CanvasPreview
+            elements={previewBackElements}
+            background={previewBackBg}
+            width={canvasWidth}
+            height={canvasHeight}
+            label="Back"
+            isActive={currentSide === 'back'}
+            onClick={() => setCurrentSide('back')}
+          />
+        </div>
+      )}
+
       <motion.div
         animate={{ scale: zoom }}
         transition={{ type: 'tween', duration: 0.1 }}
-        style={{ transformOrigin: 'center center' }}
+        style={{ transformOrigin: 'center center', perspective: 1200 }}
       >
-        {/* Export target */}
-        <div
-          ref={exportRef}
-          style={canvasStyle}
-          className="shadow-2xl"
-          onClick={() => selectElement(null)}
-        >
-          {elements.map((element) => (
-            <CanvasElement
-              key={element.id}
-              element={resolveElementStyles(element, globalStyles)}
-              isSelected={selectedElementId === element.id}
-              zoom={zoom}
-              onSelect={selectElement}
-              onUpdate={updateElement}
-            />
-          ))}
+        {/* Flip container */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={flipKey}
+            initial={isDoubleSided ? { rotateY: 90, opacity: 0.6 } : false}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0.6 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            style={{ transformStyle: 'preserve-3d' }}
+          >
+            {/* Export target */}
+            <div
+              ref={exportRef}
+              style={canvasStyle}
+              className="shadow-2xl"
+              onClick={() => selectElement(null)}
+            >
+              {elements.map((element) => (
+                <CanvasElement
+                  key={element.id}
+                  element={resolveElementStyles(element, globalStyles)}
+                  isSelected={selectedElementId === element.id}
+                  zoom={zoom}
+                  onSelect={selectElement}
+                  onUpdate={updateElement}
+                />
+              ))}
 
-          {/* Empty back side prompt */}
-          {isDoubleSided && currentSide === 'back' && elements.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-center">
-                <p className="text-sm text-slate-400">Add elements to the back of your card.</p>
-                <p className="text-xs text-slate-300 mt-1">Use the sidebar to add text, shapes, or images.</p>
-              </div>
-            </div>
-          )}
+              {/* Empty back side prompt */}
+              {isDoubleSided && currentSide === 'back' && elements.length === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="text-center">
+                    <p className="text-sm text-slate-400">Add elements to the back of your card.</p>
+                    <p className="text-xs text-slate-300 mt-1">Use the sidebar to add text, shapes, or images.</p>
+                  </div>
+                </div>
+              )}
 
-          {/* Side indicator */}
-          {isDoubleSided && (
-            <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] font-medium px-2 py-0.5 rounded-full pointer-events-none">
-              {currentSide === 'front' ? 'Front side' : 'Back side'}
+              {/* Side indicator */}
+              {isDoubleSided && (
+                <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] font-medium px-2 py-0.5 rounded-full pointer-events-none">
+                  {currentSide === 'front' ? 'Front side' : 'Back side'}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
     </div>
   );
