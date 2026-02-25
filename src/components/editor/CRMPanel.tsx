@@ -5,8 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import type { ContactData } from '@/types';
-import { cn } from '@/lib/utils';
-import { Building2, Send, Check, AlertCircle, Loader2, Link2 } from 'lucide-react';
+import { Building2, Send, Check, AlertCircle, Link2 } from 'lucide-react';
 
 interface CRMPanelProps {
   open: boolean;
