@@ -27,6 +27,7 @@ model User {
   settings      Settings?
   folders       Folder[]
   collaborations DesignCollaborator[]
+  profiles      DigitalProfile[]
 }
 
 model Account {
@@ -171,4 +172,65 @@ model Settings {
   userId        String   @unique
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DigitalProfile {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  userId      String
+  designId    String?
+
+  // Profile info
+  fullName    String
+  firstName   String?
+  lastName    String?
+  title       String?
+  company     String?
+  bio         String?  @db.Text
+  photoUrl    String?
+
+  // Contact
+  email       String?
+  phone       String?
+  website     String?
+
+  // Social links stored as JSON: [{ platform, url, username }]
+  socialLinks Json?    @default("[]")
+
+  // Custom CTA button: { label, url }
+  ctaButton   Json?
+
+  // Theme customisation: { primaryColor, backgroundColor, textColor, font }
+  theme       Json?    @default("{\"primaryColor\":\"#6366f1\",\"backgroundColor\":\"#ffffff\",\"textColor\":\"#0f172a\",\"font\":\"Inter\"}")
+
+  // Visibility
+  isPublic    Boolean  @default(true)
+
+  // Contact data for vCard generation
+  contactData Json?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  views       ProfileView[]
+
+  @@index([userId])
+  @@index([slug])
+}
+
+model ProfileView {
+  id          String   @id @default(cuid())
+  profileId   String
+  action      String   @default("view") // "view" | "save_contact" | "email" | "call" | "social_click"
+  metadata    Json?    // e.g. { platform: "linkedin" }
+  ipHash      String?  // hashed IP for dedup
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  profile     DigitalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([createdAt])
 }

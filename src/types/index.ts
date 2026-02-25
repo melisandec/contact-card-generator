@@ -222,7 +222,8 @@ export type SidebarTab =
   | "uploads"
   | "text"
   | "background"
-  | "layers";
+  | "layers"
+  | "profile";
 
 export interface ColorStop {
   color: string;
@@ -307,4 +308,84 @@ export interface QRContactOptions {
   foregroundColor?: string;
   backgroundColor?: string;
   size?: number;
+}
+
+// Digital Profile Types
+
+export interface ProfileSocialLink {
+  platform:
+    | "linkedin"
+    | "twitter"
+    | "instagram"
+    | "facebook"
+    | "github"
+    | "youtube"
+    | "tiktok"
+    | "dribbble"
+    | "behance"
+    | "other";
+  url: string;
+  username?: string;
+}
+
+export interface ProfileCTA {
+  label: string;
+  url: string;
+}
+
+export interface ProfileTheme {
+  primaryColor: string;
+  backgroundColor: string;
+  textColor: string;
+  font: string;
+}
+
+export interface DigitalProfile {
+  id: string;
+  slug: string;
+  userId: string;
+  designId?: string | null;
+
+  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  title?: string;
+  company?: string;
+  bio?: string;
+  photoUrl?: string;
+
+  email?: string;
+  phone?: string;
+  website?: string;
+
+  socialLinks: ProfileSocialLink[];
+  ctaButton?: ProfileCTA | null;
+  theme: ProfileTheme;
+
+  isPublic: boolean;
+  contactData?: ContactData;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProfileView {
+  id: string;
+  profileId: string;
+  action: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface ProfileAnalytics {
+  totalViews: number;
+  last7Days: number;
+  actions: {
+    view: number;
+    save_contact: number;
+    email: number;
+    call: number;
+    social_click: number;
+  };
+  dailyViews: Array<{ date: string; count: number }>;
 }
