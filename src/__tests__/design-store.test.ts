@@ -1,5 +1,5 @@
-import { useDesignStore } from '@/store/design-store';
-import { DesignElement, CanvasBackground } from '@/types';
+import { useDesignStore, resolveElementStyles } from '@/store/design-store';
+import { DesignElement, CanvasBackground, GlobalStyles } from '@/types';
 
 const defaultBackground: CanvasBackground = {
   type: 'solid',
@@ -60,6 +60,13 @@ describe('Design Store', () => {
       backBackground: defaultBackground,
       currentSide: 'front',
       isDoubleSided: false,
+      globalStyles: {
+        colors: [
+          { id: 'primary', value: '#003153', label: 'Primary' },
+          { id: 'secondary', value: '#C5A572', label: 'Accent' },
+        ],
+        fonts: { heading: 'Playfair Display', body: 'Montserrat' },
+      },
     });
   });
 
@@ -380,6 +387,304 @@ describe('Design Store', () => {
       expect(useDesignStore.getState().isDirty).toBe(true);
       // Elements still intact
       expect(useDesignStore.getState().elements).toHaveLength(1);
+    });
+  });
+
+  describe('global styles', () => {
+    it('loads with default global styles', () => {
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors).toHaveLength(2);
+      expect(state.globalStyles.fonts.heading).toBe('Playfair Display');
+      expect(state.globalStyles.fonts.body).toBe('Montserrat');
+    });
+
+    it('loadFullDesign preserves globalStyles', () => {
+      const customStyles: GlobalStyles = {
+        colors: [{ id: 'brand', value: '#ff0000', label: 'Brand' }],
+        fonts: { heading: 'Georgia', body: 'Arial' },
+      };
+
+      useDesignStore.getState().loadFullDesign({
+        id: 'gs-1',
+        frontLayers: [sampleElement],
+        globalStyles: customStyles,
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors).toHaveLength(1);
+      expect(state.globalStyles.colors[0].value).toBe('#ff0000');
+      expect(state.globalStyles.fonts.heading).toBe('Georgia');
+    });
+
+    it('setGlobalColor updates a specific color', () => {
+      useDesignStore.getState().setGlobalColor('primary', '#112233');
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors.find((c) => c.id === 'primary')?.value).toBe('#112233');
+      expect(state.isDirty).toBe(true);
+    });
+
+    it('setGlobalFont updates heading or body font', () => {
+      useDesignStore.getState().setGlobalFont('heading', 'Georgia');
+      expect(useDesignStore.getState().globalStyles.fonts.heading).toBe('Georgia');
+
+      useDesignStore.getState().setGlobalFont('body', 'Arial');
+      expect(useDesignStore.getState().globalStyles.fonts.body).toBe('Arial');
+    });
+
+    it('addGlobalColor adds a new color to palette', () => {
+      useDesignStore.getState().addGlobalColor({ id: 'accent2', value: '#00ff00', label: 'Accent 2' });
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors).toHaveLength(3);
+      expect(state.globalStyles.colors[2].id).toBe('accent2');
+    });
+
+    it('removeGlobalColor removes a color from palette', () => {
+      useDesignStore.getState().removeGlobalColor('secondary');
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors).toHaveLength(1);
+      expect(state.globalStyles.colors[0].id).toBe('primary');
+    });
+
+    it('applyGlobalColorToElement sets color and styleRef on text element', () => {
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        color: '#000000',
+      });
+      const elId = useDesignStore.getState().elements[0].id;
+
+      useDesignStore.getState().applyGlobalColorToElement(elId, 'primary', 'color');
+      const el = useDesignStore.getState().elements[0];
+      expect(el.color).toBe('#003153');
+      expect(el.styleRefs?.colorRef).toBe('primary');
+    });
+
+    it('applyGlobalColorToElement sets fill and styleRef on shape element', () => {
+      useDesignStore.getState().addElement({
+        type: 'shape',
+        x: 0, y: 0, width: 100, height: 100, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, shapeType: 'rectangle',
+        fill: '#000000',
+      });
+      const elId = useDesignStore.getState().elements[0].id;
+
+      useDesignStore.getState().applyGlobalColorToElement(elId, 'secondary', 'fill');
+      const el = useDesignStore.getState().elements[0];
+      expect(el.fill).toBe('#C5A572');
+      expect(el.styleRefs?.colorRef).toBe('secondary');
+    });
+
+    it('applyGlobalFontToElement sets font and styleRef', () => {
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        fontFamily: 'Arial',
+      });
+      const elId = useDesignStore.getState().elements[0].id;
+
+      useDesignStore.getState().applyGlobalFontToElement(elId, 'heading');
+      const el = useDesignStore.getState().elements[0];
+      expect(el.fontFamily).toBe('Playfair Display');
+      expect(el.styleRefs?.fontRef).toBe('heading');
+    });
+
+    it('unlinkElementStyle removes styleRefs from element', () => {
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        color: '#003153',
+        styleRefs: { colorRef: 'primary', fontRef: 'heading' },
+      });
+      const elId = useDesignStore.getState().elements[0].id;
+
+      useDesignStore.getState().unlinkElementStyle(elId);
+      const el = useDesignStore.getState().elements[0];
+      expect(el.styleRefs).toBeUndefined();
+      // color value is preserved even after unlinking
+      expect(el.color).toBe('#003153');
+    });
+
+    it('changing global color auto-resolves for linked elements', () => {
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        color: '#003153',
+      });
+      const elId = useDesignStore.getState().elements[0].id;
+
+      // Link element to primary color
+      useDesignStore.getState().applyGlobalColorToElement(elId, 'primary', 'color');
+
+      // Change global color
+      useDesignStore.getState().setGlobalColor('primary', '#ff0000');
+
+      // Resolve element styles
+      const el = useDesignStore.getState().elements[0];
+      const resolved = resolveElementStyles(el, useDesignStore.getState().globalStyles);
+      expect(resolved.color).toBe('#ff0000');
+    });
+
+    it('resolveElementStyles applies global font', () => {
+      const el: DesignElement = {
+        id: 'test-resolve',
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        fontFamily: 'Arial',
+        styleRefs: { fontRef: 'body' },
+      };
+
+      const resolved = resolveElementStyles(el, useDesignStore.getState().globalStyles);
+      expect(resolved.fontFamily).toBe('Montserrat');
+    });
+
+    it('resolveElementStyles applies overrides', () => {
+      const el: DesignElement = {
+        id: 'test-override',
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        fontSize: 16,
+        styleRefs: { fontRef: 'heading', overrides: { fontSize: 24, letterSpacing: 2 } },
+      };
+
+      const resolved = resolveElementStyles(el, useDesignStore.getState().globalStyles);
+      expect(resolved.fontFamily).toBe('Playfair Display');
+      expect(resolved.fontSize).toBe(24);
+      expect(resolved.letterSpacing).toBe(2);
+    });
+
+    it('resolveElementStyles returns element unchanged when no styleRefs', () => {
+      const el: DesignElement = {
+        id: 'test-no-ref',
+        type: 'text',
+        x: 0, y: 0, width: 100, height: 50, rotation: 0, opacity: 1,
+        locked: false, visible: true, zIndex: 0, content: 'Test',
+        fontFamily: 'Arial',
+        color: '#000000',
+      };
+
+      const resolved = resolveElementStyles(el, useDesignStore.getState().globalStyles);
+      expect(resolved).toBe(el);
+    });
+
+    it('copyStylesToSide marks design as dirty', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'gs-copy',
+        frontLayers: [sampleElement],
+        backLayers: [sampleElement2],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().copyStylesToSide();
+      expect(useDesignStore.getState().isDirty).toBe(true);
+    });
+
+    it('setGlobalStyles replaces all global styles', () => {
+      const newStyles: GlobalStyles = {
+        colors: [{ id: 'custom', value: '#abcdef', label: 'Custom' }],
+        fonts: { heading: 'Roboto', body: 'Open Sans' },
+      };
+
+      useDesignStore.getState().setGlobalStyles(newStyles);
+      const state = useDesignStore.getState();
+      expect(state.globalStyles.colors).toHaveLength(1);
+      expect(state.globalStyles.colors[0].id).toBe('custom');
+      expect(state.globalStyles.fonts.heading).toBe('Roboto');
+      expect(state.globalStyles.fonts.body).toBe('Open Sans');
+    });
+  });
+
+  describe('copyFrontToBack', () => {
+    it('copies front elements and background to back (while on front)', () => {
+      const frontBg: CanvasBackground = { type: 'solid', color: '#ff0000' };
+      useDesignStore.getState().loadFullDesign({
+        id: 'copy-1',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        frontBackground: frontBg,
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().copyFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.backLayers).toHaveLength(1);
+      expect(state.backLayers[0].content).toBe('Hello');
+      expect(state.backLayers[0].id).not.toBe(sampleElement.id); // new IDs
+      expect(state.backBackground.color).toBe('#ff0000');
+      expect(state.isDirty).toBe(true);
+    });
+
+    it('copies front elements to back (while on back side)', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'copy-2',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Switch to back
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().elements).toHaveLength(0);
+
+      useDesignStore.getState().copyFrontToBack();
+      const state = useDesignStore.getState();
+      // Elements should now be visible since we're on the back side
+      expect(state.elements).toHaveLength(1);
+      expect(state.elements[0].content).toBe('Hello');
+      expect(state.elements[0].id).not.toBe(sampleElement.id);
+    });
+  });
+
+  describe('mirrorFrontToBack', () => {
+    it('mirrors front elements to back with flipped x positions', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'mirror-1',
+        frontLayers: [sampleElement], // x=100, width=200, canvasWidth=1050
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().mirrorFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.backLayers).toHaveLength(1);
+      // Mirrored x = canvasWidth - x - width = 1050 - 100 - 200 = 750
+      expect(state.backLayers[0].x).toBe(750);
+      expect(state.backLayers[0].y).toBe(100); // y unchanged
+      expect(state.backLayers[0].content).toBe('Hello');
+      expect(state.backLayers[0].id).not.toBe(sampleElement.id);
+    });
+
+    it('mirrors front elements while on back side updates current elements', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'mirror-2',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().setCurrentSide('back');
+      useDesignStore.getState().mirrorFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.elements).toHaveLength(1);
+      expect(state.elements[0].x).toBe(750);
     });
   });
 });
