@@ -22,7 +22,7 @@ interface ExportModalProps {
 
 export function ExportModal({ canvasRef }: ExportModalProps) {
   const { exportModalOpen, setExportModalOpen } = useUIStore();
-  const { canvasWidth, canvasHeight, isDoubleSided, currentSide, setCurrentSide, elements, background, frontLayers, backLayers, frontBackground, backBackground } = useDesignStore();
+  const { canvasWidth, canvasHeight, isDoubleSided, currentSide, setCurrentSide } = useDesignStore();
   const [format, setFormat] = useState<ExportFormat>('png');
   const [scale, setScale] = useState(2);
   const [isExporting, setIsExporting] = useState(false);
