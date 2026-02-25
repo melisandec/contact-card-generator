@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useDesignStore } from '@/store/design-store';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { presetColors } from '@/data/colors';
 import {
@@ -242,6 +241,193 @@ export function PropertiesPanel() {
                   type="number"
                   value={selected.borderRadius ?? 0}
                   onChange={(e) => update({ borderRadius: Math.max(0, parseInt(e.target.value) || 0) })}
+                />
+              )}
+            </div>
+          </Section>
+        )}
+
+        {/* QR Code Styling */}
+        {selected.type === 'qrcode' && (
+          <Section title="QR Style">
+            <div className="space-y-2">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Dot Shape</label>
+                <select
+                  value={selected.qrStyle?.dotShape ?? 'square'}
+                  onChange={(e) => update({
+                    qrStyle: {
+                      ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                      dotShape: e.target.value as 'square' | 'rounded' | 'circle' | 'diamond',
+                    },
+                  })}
+                  className="w-full h-9 border border-slate-200 rounded-lg px-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  <option value="square">Square (standard)</option>
+                  <option value="rounded">Rounded</option>
+                  <option value="circle">Circle</option>
+                  <option value="diamond">Diamond</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Background Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={selected.qrStyle?.backgroundColor ?? '#ffffff'}
+                    onChange={(e) => update({
+                      qrStyle: {
+                        ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                        backgroundColor: e.target.value,
+                      },
+                    })}
+                    className="w-8 h-8 rounded border border-slate-200 cursor-pointer"
+                  />
+                  <span className="text-xs text-slate-500 font-mono">
+                    {selected.qrStyle?.backgroundColor ?? '#ffffff'}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Gradient</label>
+                <select
+                  value={selected.qrStyle?.gradient?.type ?? 'none'}
+                  onChange={(e) => {
+                    const gradType = e.target.value;
+                    if (gradType === 'none') {
+                      update({
+                        qrStyle: {
+                          ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                          gradient: undefined,
+                        },
+                      });
+                    } else {
+                      update({
+                        qrStyle: {
+                          ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                          gradient: {
+                            type: gradType as 'linear' | 'radial',
+                            colors: selected.qrStyle?.gradient?.colors ?? ['#000000', '#6366f1'],
+                          },
+                        },
+                      });
+                    }
+                  }}
+                  className="w-full h-9 border border-slate-200 rounded-lg px-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  <option value="none">None</option>
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                </select>
+              </div>
+              {selected.qrStyle?.gradient && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Start Color</label>
+                    <input
+                      type="color"
+                      value={selected.qrStyle.gradient.colors[0] ?? '#000000'}
+                      onChange={(e) => update({
+                        qrStyle: {
+                          ...selected.qrStyle!,
+                          gradient: {
+                            ...selected.qrStyle!.gradient!,
+                            colors: [e.target.value, selected.qrStyle!.gradient!.colors[1] ?? '#6366f1'],
+                          },
+                        },
+                      })}
+                      className="w-8 h-8 rounded border border-slate-200 cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">End Color</label>
+                    <input
+                      type="color"
+                      value={selected.qrStyle.gradient.colors[1] ?? '#6366f1'}
+                      onChange={(e) => update({
+                        qrStyle: {
+                          ...selected.qrStyle!,
+                          gradient: {
+                            ...selected.qrStyle!.gradient!,
+                            colors: [selected.qrStyle!.gradient!.colors[0] ?? '#000000', e.target.value],
+                          },
+                        },
+                      })}
+                      className="w-8 h-8 rounded border border-slate-200 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Center Logo</label>
+                <button
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/png,image/svg+xml';
+                    input.onchange = (ev) => {
+                      const file = (ev.target as HTMLInputElement).files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (re) => {
+                        update({
+                          qrStyle: {
+                            ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                            logoUrl: re.target?.result as string,
+                            logoSize: 20,
+                          },
+                        });
+                      };
+                      reader.readAsDataURL(file);
+                    };
+                    input.click();
+                  }}
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-600"
+                >
+                  {selected.qrStyle?.logoUrl ? 'Change Logo' : 'Upload Logo'}
+                </button>
+                {selected.qrStyle?.logoUrl && (
+                  <button
+                    onClick={() => update({
+                      qrStyle: {
+                        ...(selected.qrStyle ?? { dotShape: 'square' as const }),
+                        logoUrl: undefined,
+                        logoSize: undefined,
+                      },
+                    })}
+                    className="text-[10px] text-red-500 hover:text-red-600 mt-1 transition-colors"
+                  >
+                    Remove logo
+                  </button>
+                )}
+              </div>
+            </div>
+          </Section>
+        )}
+
+        {/* Text on Path */}
+        {selected.type === 'text' && (
+          <Section title="Text on Path">
+            <div className="space-y-2">
+              <p className="text-xs text-slate-400">
+                {selected.pathRef
+                  ? 'Text is attached to a path.'
+                  : 'Select both a text and a path element, then click "Attach to Path".'}
+              </p>
+              {selected.pathRef && (
+                <button
+                  onClick={() => update({ pathRef: undefined, pathOffset: undefined })}
+                  className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-600"
+                >
+                  Detach from Path
+                </button>
+              )}
+              {selected.pathRef && (
+                <Input
+                  label="Offset"
+                  type="number"
+                  value={selected.pathOffset ?? 0}
+                  onChange={(e) => update({ pathOffset: parseInt(e.target.value) || 0 })}
                 />
               )}
             </div>

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { DesignElement, CanvasBackground, GlobalStyles } from '@/types';
+import { DesignElement, CanvasBackground, GlobalStyles, Guide } from '@/types';
 import { generateId } from '@/lib/utils';
 
 interface HistoryEntry {
@@ -24,6 +24,7 @@ interface DesignState {
 
   elements: DesignElement[];
   selectedElementId: string | null;
+  selectedElementIds: string[];
   background: CanvasBackground;
   zoom: number;
   canvasWidth: number;
@@ -43,11 +44,19 @@ interface DesignState {
   // Global styles
   globalStyles: GlobalStyles;
 
+  // Guides
+  guides: Guide[];
+  guidesLocked: boolean;
+  guidesVisible: boolean;
+  snapThreshold: number;
+
   // Actions
   addElement: (element: Omit<DesignElement, 'id'>) => void;
   removeElement: (id: string) => void;
   updateElement: (id: string, updates: Partial<DesignElement>) => void;
   selectElement: (id: string | null) => void;
+  toggleSelectElement: (id: string) => void;
+  selectMultipleElements: (ids: string[]) => void;
   setZoom: (zoom: number) => void;
   setBackground: (background: CanvasBackground) => void;
   setCanvasSize: (width: number, height: number) => void;
@@ -58,6 +67,22 @@ interface DesignState {
   redo: () => void;
   clearCanvas: () => void;
   loadDesign: (elements: DesignElement[], background: CanvasBackground, width: number, height: number) => void;
+
+  // Smart Alignment & Distribution
+  alignElements: (alignment: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => void;
+  distributeElements: (axis: 'horizontal' | 'vertical') => void;
+  matchDimensions: (dimension: 'width' | 'height') => void;
+
+  // Layer Groups
+  groupElements: () => void;
+  ungroupElements: () => void;
+
+  // Guides
+  addGuide: (orientation: 'horizontal' | 'vertical', position: number) => void;
+  removeGuide: (id: string) => void;
+  updateGuide: (id: string, position: number) => void;
+  setGuidesLocked: (locked: boolean) => void;
+  setGuidesVisible: (visible: boolean) => void;
 
   // Double-sided actions
   setCurrentSide: (side: 'front' | 'back') => void;
@@ -70,6 +95,7 @@ interface DesignState {
     frontBackground?: CanvasBackground;
     backBackground?: CanvasBackground;
     globalStyles?: GlobalStyles;
+    guides?: Guide[];
     isDoubleSided: boolean;
     width: number;
     height: number;
@@ -123,6 +149,7 @@ const defaultBackground: CanvasBackground = {
 export const useDesignStore = create<DesignState>()((set) => ({
     elements: [],
     selectedElementId: null,
+    selectedElementIds: [],
     background: defaultBackground,
     zoom: 1,
     canvasWidth: 1050,
@@ -142,6 +169,12 @@ export const useDesignStore = create<DesignState>()((set) => ({
 
     // Global styles
     globalStyles: defaultGlobalStyles,
+
+    // Guides
+    guides: [],
+    guidesLocked: false,
+    guidesVisible: true,
+    snapThreshold: 5,
 
     addElement: (elementData) =>
       set((state) => {
@@ -188,7 +221,24 @@ export const useDesignStore = create<DesignState>()((set) => ({
         isDirty: true,
       })),
 
-    selectElement: (id) => set({ selectedElementId: id }),
+    selectElement: (id) => set({ selectedElementId: id, selectedElementIds: id ? [id] : [] }),
+
+    toggleSelectElement: (id) =>
+      set((state) => {
+        const ids = state.selectedElementIds.includes(id)
+          ? state.selectedElementIds.filter((eid) => eid !== id)
+          : [...state.selectedElementIds, id];
+        return {
+          selectedElementIds: ids,
+          selectedElementId: ids.length === 1 ? ids[0] : ids.length === 0 ? null : state.selectedElementId,
+        };
+      }),
+
+    selectMultipleElements: (ids) =>
+      set({
+        selectedElementIds: ids,
+        selectedElementId: ids.length === 1 ? ids[0] : null,
+      }),
 
     setZoom: (zoom) => set({ zoom }),
 
@@ -308,16 +358,264 @@ export const useDesignStore = create<DesignState>()((set) => ({
         canvasWidth: width,
         canvasHeight: height,
         selectedElementId: null,
+        selectedElementIds: [],
         history: [{ elements: JSON.parse(JSON.stringify(elements)), background: JSON.parse(JSON.stringify(background)) }],
         historyIndex: 0,
         isDirty: false,
       }),
 
+    // Smart Alignment & Distribution
+    alignElements: (alignment) =>
+      set((state) => {
+        const ids = state.selectedElementIds;
+        if (ids.length < 2) return {};
+        const selected = state.elements.filter((el) => ids.includes(el.id));
+        if (selected.length < 2) return {};
+
+        const entry: HistoryEntry = {
+          elements: JSON.parse(JSON.stringify(state.elements)),
+          background: JSON.parse(JSON.stringify(state.background)),
+        };
+        const history = [...state.history.slice(0, state.historyIndex + 1), entry].slice(-50);
+
+        const updates: Record<string, Partial<DesignElement>> = {};
+        switch (alignment) {
+          case 'left': {
+            const minX = Math.min(...selected.map((el) => el.x));
+            selected.forEach((el) => { updates[el.id] = { x: minX }; });
+            break;
+          }
+          case 'right': {
+            const maxRight = Math.max(...selected.map((el) => el.x + el.width));
+            selected.forEach((el) => { updates[el.id] = { x: maxRight - el.width }; });
+            break;
+          }
+          case 'top': {
+            const minY = Math.min(...selected.map((el) => el.y));
+            selected.forEach((el) => { updates[el.id] = { y: minY }; });
+            break;
+          }
+          case 'bottom': {
+            const maxBottom = Math.max(...selected.map((el) => el.y + el.height));
+            selected.forEach((el) => { updates[el.id] = { y: maxBottom - el.height }; });
+            break;
+          }
+          case 'center-h': {
+            const minX = Math.min(...selected.map((el) => el.x));
+            const maxRight = Math.max(...selected.map((el) => el.x + el.width));
+            const centerX = (minX + maxRight) / 2;
+            selected.forEach((el) => { updates[el.id] = { x: Math.round(centerX - el.width / 2) }; });
+            break;
+          }
+          case 'center-v': {
+            const minY = Math.min(...selected.map((el) => el.y));
+            const maxBottom = Math.max(...selected.map((el) => el.y + el.height));
+            const centerY = (minY + maxBottom) / 2;
+            selected.forEach((el) => { updates[el.id] = { y: Math.round(centerY - el.height / 2) }; });
+            break;
+          }
+        }
+
+        return {
+          elements: state.elements.map((el) =>
+            updates[el.id] ? { ...el, ...updates[el.id] } : el
+          ),
+          isDirty: true,
+          history,
+          historyIndex: history.length - 1,
+        };
+      }),
+
+    distributeElements: (axis) =>
+      set((state) => {
+        const ids = state.selectedElementIds;
+        if (ids.length < 3) return {};
+        const selected = state.elements.filter((el) => ids.includes(el.id));
+        if (selected.length < 3) return {};
+
+        const entry: HistoryEntry = {
+          elements: JSON.parse(JSON.stringify(state.elements)),
+          background: JSON.parse(JSON.stringify(state.background)),
+        };
+        const history = [...state.history.slice(0, state.historyIndex + 1), entry].slice(-50);
+
+        const updates: Record<string, Partial<DesignElement>> = {};
+        if (axis === 'horizontal') {
+          const sorted = [...selected].sort((a, b) => a.x - b.x);
+          const totalWidth = sorted.reduce((sum, el) => sum + el.width, 0);
+          const minX = sorted[0].x;
+          const maxRight = sorted[sorted.length - 1].x + sorted[sorted.length - 1].width;
+          const totalSpace = maxRight - minX - totalWidth;
+          const gap = totalSpace / (sorted.length - 1);
+          let currentX = minX;
+          sorted.forEach((el) => {
+            updates[el.id] = { x: Math.round(currentX) };
+            currentX += el.width + gap;
+          });
+        } else {
+          const sorted = [...selected].sort((a, b) => a.y - b.y);
+          const totalHeight = sorted.reduce((sum, el) => sum + el.height, 0);
+          const minY = sorted[0].y;
+          const maxBottom = sorted[sorted.length - 1].y + sorted[sorted.length - 1].height;
+          const totalSpace = maxBottom - minY - totalHeight;
+          const gap = totalSpace / (sorted.length - 1);
+          let currentY = minY;
+          sorted.forEach((el) => {
+            updates[el.id] = { y: Math.round(currentY) };
+            currentY += el.height + gap;
+          });
+        }
+
+        return {
+          elements: state.elements.map((el) =>
+            updates[el.id] ? { ...el, ...updates[el.id] } : el
+          ),
+          isDirty: true,
+          history,
+          historyIndex: history.length - 1,
+        };
+      }),
+
+    matchDimensions: (dimension) =>
+      set((state) => {
+        const ids = state.selectedElementIds;
+        if (ids.length < 2) return {};
+        const selected = state.elements.filter((el) => ids.includes(el.id));
+        if (selected.length < 2) return {};
+
+        const entry: HistoryEntry = {
+          elements: JSON.parse(JSON.stringify(state.elements)),
+          background: JSON.parse(JSON.stringify(state.background)),
+        };
+        const history = [...state.history.slice(0, state.historyIndex + 1), entry].slice(-50);
+
+        const maxVal = dimension === 'width'
+          ? Math.max(...selected.map((el) => el.width))
+          : Math.max(...selected.map((el) => el.height));
+
+        return {
+          elements: state.elements.map((el) =>
+            ids.includes(el.id) ? { ...el, [dimension]: maxVal } : el
+          ),
+          isDirty: true,
+          history,
+          historyIndex: history.length - 1,
+        };
+      }),
+
+    // Layer Groups
+    groupElements: () =>
+      set((state) => {
+        const ids = state.selectedElementIds;
+        if (ids.length < 2) return {};
+        const selected = state.elements.filter((el) => ids.includes(el.id));
+        if (selected.length < 2) return {};
+
+        const entry: HistoryEntry = {
+          elements: JSON.parse(JSON.stringify(state.elements)),
+          background: JSON.parse(JSON.stringify(state.background)),
+        };
+        const history = [...state.history.slice(0, state.historyIndex + 1), entry].slice(-50);
+
+        const minX = Math.min(...selected.map((el) => el.x));
+        const minY = Math.min(...selected.map((el) => el.y));
+        const maxRight = Math.max(...selected.map((el) => el.x + el.width));
+        const maxBottom = Math.max(...selected.map((el) => el.y + el.height));
+
+        const children: DesignElement[] = selected.map((el) => ({
+          ...JSON.parse(JSON.stringify(el)),
+          x: el.x - minX,
+          y: el.y - minY,
+        }));
+
+        const group: DesignElement = {
+          id: generateId(),
+          type: 'group',
+          x: minX,
+          y: minY,
+          width: maxRight - minX,
+          height: maxBottom - minY,
+          rotation: 0,
+          opacity: 1,
+          locked: false,
+          visible: true,
+          zIndex: state.elements.length,
+          children,
+        };
+
+        const remaining = state.elements.filter((el) => !ids.includes(el.id));
+        const updatedElements = [...remaining, group].map((el, i) => ({ ...el, zIndex: i }));
+
+        return {
+          elements: updatedElements,
+          selectedElementId: group.id,
+          selectedElementIds: [group.id],
+          isDirty: true,
+          history,
+          historyIndex: history.length - 1,
+        };
+      }),
+
+    ungroupElements: () =>
+      set((state) => {
+        const id = state.selectedElementId;
+        if (!id) return {};
+        const group = state.elements.find((el) => el.id === id);
+        if (!group || group.type !== 'group' || !group.children) return {};
+
+        const entry: HistoryEntry = {
+          elements: JSON.parse(JSON.stringify(state.elements)),
+          background: JSON.parse(JSON.stringify(state.background)),
+        };
+        const history = [...state.history.slice(0, state.historyIndex + 1), entry].slice(-50);
+
+        const restored: DesignElement[] = group.children.map((child) => ({
+          ...child,
+          x: child.x + group.x,
+          y: child.y + group.y,
+        }));
+
+        const remaining = state.elements.filter((el) => el.id !== id);
+        const updatedElements = [...remaining, ...restored].map((el, i) => ({ ...el, zIndex: i }));
+        const restoredIds = restored.map((el) => el.id);
+
+        return {
+          elements: updatedElements,
+          selectedElementId: null,
+          selectedElementIds: restoredIds,
+          isDirty: true,
+          history,
+          historyIndex: history.length - 1,
+        };
+      }),
+
+    // Guides
+    addGuide: (orientation, position) =>
+      set((state) => ({
+        guides: [...state.guides, { id: generateId(), orientation, position }],
+        isDirty: true,
+      })),
+
+    removeGuide: (id) =>
+      set((state) => ({
+        guides: state.guides.filter((g) => g.id !== id),
+        isDirty: true,
+      })),
+
+    updateGuide: (id, position) =>
+      set((state) => ({
+        guides: state.guides.map((g) => g.id === id ? { ...g, position } : g),
+        isDirty: true,
+      })),
+
+    setGuidesLocked: (locked) => set({ guidesLocked: locked }),
+    setGuidesVisible: (visible) => set({ guidesVisible: visible }),
+
     // Double-sided actions
     setCurrentSide: (side) =>
       set((state) => {
         // Save current side's layers before switching
-        const updates: Partial<DesignState> = { currentSide: side, selectedElementId: null };
+        const updates: Partial<DesignState> = { currentSide: side, selectedElementId: null, selectedElementIds: [] };
         if (state.currentSide === 'front') {
           updates.frontLayers = [...state.elements];
           updates.frontBackground = { ...state.background };
@@ -346,6 +644,7 @@ export const useDesignStore = create<DesignState>()((set) => ({
         frontBackground: design.frontBackground || defaultBackground,
         backBackground: design.backBackground || defaultBackground,
         globalStyles: design.globalStyles || defaultGlobalStyles,
+        guides: design.guides || [],
         isDoubleSided: design.isDoubleSided,
         elements: design.frontLayers,
         background: design.frontBackground || defaultBackground,
@@ -353,6 +652,7 @@ export const useDesignStore = create<DesignState>()((set) => ({
         canvasWidth: design.width,
         canvasHeight: design.height,
         selectedElementId: null,
+        selectedElementIds: [],
         history: [{ elements: JSON.parse(JSON.stringify(design.frontLayers)), background: JSON.parse(JSON.stringify(design.frontBackground || defaultBackground)) }],
         historyIndex: 0,
         isDirty: false,

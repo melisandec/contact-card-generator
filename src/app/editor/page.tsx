@@ -32,6 +32,8 @@ function EditorContent() {
     currentSide,
     setCurrentSide,
     isDoubleSided,
+    groupElements,
+    ungroupElements,
   } = useDesignStore();
   const { exportModalOpen } = useUIStore();
   const searchParams = useSearchParams();
@@ -91,12 +93,18 @@ function EditorContent() {
         if (isDoubleSided) {
           setCurrentSide(currentSide === "front" ? "back" : "front");
         }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "g" && !e.shiftKey) {
+        e.preventDefault();
+        groupElements();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "g" && e.shiftKey) {
+        e.preventDefault();
+        ungroupElements();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [zoom, setZoom, undo, redo, isDoubleSided, currentSide, setCurrentSide]);
+  }, [zoom, setZoom, undo, redo, isDoubleSided, currentSide, setCurrentSide, groupElements, ungroupElements]);
 
   if (designId && isDesignLoading) {
     return (

@@ -21,9 +21,26 @@ export interface StyleRefs {
   };
 }
 
+export interface QRStyle {
+  dotShape: "square" | "rounded" | "circle" | "diamond";
+  gradient?: {
+    type: "linear" | "radial";
+    colors: string[];
+  };
+  logoUrl?: string;
+  logoSize?: number;
+  backgroundColor?: string;
+}
+
+export interface Guide {
+  id: string;
+  orientation: "horizontal" | "vertical";
+  position: number;
+}
+
 export interface DesignElement {
   id: string;
-  type: "text" | "image" | "shape" | "qrcode" | "icon";
+  type: "text" | "image" | "shape" | "qrcode" | "icon" | "group";
   x: number;
   y: number;
   width: number;
@@ -50,11 +67,12 @@ export interface DesignElement {
   letterSpacing?: number;
 
   // Shape properties
-  shapeType?: "rectangle" | "circle" | "triangle" | "line" | "star";
+  shapeType?: "rectangle" | "circle" | "triangle" | "line" | "star" | "polygon";
   fill?: string;
   stroke?: string;
   strokeWidth?: number;
   borderRadius?: number;
+  sides?: number;
 
   // Image properties
   src?: string;
@@ -70,10 +88,18 @@ export interface DesignElement {
   qrData?: string;
   qrForeground?: string;
   qrBackground?: string;
+  qrStyle?: QRStyle;
 
   // Icon
   iconName?: string;
   iconSize?: number;
+
+  // Group (nested elements)
+  children?: DesignElement[];
+
+  // Text on path
+  pathRef?: string;
+  pathOffset?: number;
 }
 
 export interface CanvasBackground {
@@ -117,6 +143,7 @@ export interface Design {
   frontLayers?: DesignElement[];
   backLayers?: DesignElement[];
   globalStyles?: GlobalStyles;
+  guides?: Guide[];
   isDoubleSided: boolean;
   width: number;
   height: number;
