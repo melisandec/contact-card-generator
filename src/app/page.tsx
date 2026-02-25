@@ -94,6 +94,12 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-3">
               <Link
+                href="/auth/signin"
+                className="text-sm text-white/70 hover:text-white transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
                 href="/editor"
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
               >
