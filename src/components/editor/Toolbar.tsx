@@ -16,20 +16,25 @@ import {
   ArrowRightLeft,
   Copy,
   Columns2,
+  Ruler,
+  Lock,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface ToolbarProps {
   splitView?: boolean;
   onToggleSplitView?: () => void;
+  children?: React.ReactNode;
 }
 
-export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
+export function Toolbar({ splitView, onToggleSplitView, children }: ToolbarProps) {
   const {
     zoom, setZoom, undo, redo, clearCanvas, historyIndex, history,
     currentSide, setCurrentSide, isDoubleSided,
     copyStylesToSide, copyFrontToBack, mirrorFrontToBack,
+    guidesVisible, setGuidesVisible, guidesLocked, setGuidesLocked,
   } = useDesignStore();
   const { setExportModalOpen, setSaveModalOpen } = useUIStore();
 
@@ -88,6 +93,33 @@ export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
         <Button variant="ghost" size="icon-sm" onClick={zoomIn} title="Zoom in">
           <ZoomIn className="w-4 h-4" />
         </Button>
+      </div>
+
+      {/* Guides toggle */}
+      <div className="h-5 w-px bg-slate-200" />
+      <div className="flex items-center gap-0.5">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setGuidesVisible(!guidesVisible)}
+          title={guidesVisible ? 'Hide rulers & guides' : 'Show rulers & guides'}
+          className={cn(guidesVisible && 'bg-slate-100 text-indigo-600')}
+        >
+          <Ruler className="w-4 h-4" />
+        </Button>
+        {guidesVisible && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setGuidesLocked(!guidesLocked)}
+              title={guidesLocked ? 'Unlock guides' : 'Lock guides'}
+              className={cn(guidesLocked && 'bg-slate-100 text-amber-600')}
+            >
+              <Lock className="w-4 h-4" />
+            </Button>
+          </>
+        )}
       </div>
 
       {/* Side Switcher — visible when double-sided */}
@@ -197,6 +229,21 @@ export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
       </Button>
 
       <div className="flex-1" />
+
+      {/* Custom toolbar children (Import, CRM, etc.) */}
+      {children && (
+        <>
+          <div className="h-5 w-px bg-slate-200" />
+          <div className="flex items-center gap-0.5">
+            {children}
+          </div>
+        </>
+      )}
+
+      <div className="h-5 w-px bg-slate-200" />
+
+      {/* Language switcher */}
+      <LanguageSwitcher />
 
       {/* Save */}
       <Button

@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Guardar",
+    "export": "Exportar",
+    "cancel": "Cancelar",
+    "apply": "Aplicar",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "clear": "Limpiar lienzo",
+    "import": "Importar",
+    "embed": "Incrustar",
+    "copy": "Copiar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "back": "Volver"
+  },
+  "toolbar": {
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "hideGuides": "Ocultar reglas y guías",
+    "showGuides": "Mostrar reglas y guías",
+    "lockGuides": "Bloquear guías",
+    "unlockGuides": "Desbloquear guías",
+    "front": "Frente",
+    "backSide": "Reverso",
+    "flipSide": "Voltear lado",
+    "clearConfirm": "¿Limpiar todos los elementos? Esto no se puede deshacer.",
+    "copyFrontToBack": "Copiar frente al reverso",
+    "mirrorFrontOnBack": "Reflejar frente en el reverso",
+    "copyStyles": "Copiar estilos al otro lado",
+    "showSplitView": "Mostrar vista dividida",
+    "hideSplitView": "Ocultar vista dividida"
+  },
+  "sidebar": {
+    "templates": "Plantillas",
+    "elements": "Elementos",
+    "uploads": "Subidas",
+    "text": "Texto",
+    "background": "Fondo",
+    "layers": "Capas"
+  },
+  "properties": {
+    "title": "Propiedades",
+    "globalStyles": "Estilos Globales",
+    "noElement": "Ningún elemento seleccionado",
+    "noElementHint": "Haz clic en un elemento del lienzo para editar sus propiedades",
+    "positionSize": "Posición y Tamaño",
+    "textSection": "Texto",
+    "content": "Contenido",
+    "fontFamily": "Familia de Fuente",
+    "fontSize": "Tamaño de Fuente",
+    "textColor": "Color de Texto",
+    "autoShrink": "Reducir texto automáticamente",
+    "autoShrinkHint": "Reduce el tamaño de fuente cuando el texto desborda",
+    "shadow": "Sombra",
+    "styleFromTheme": "Estilo del Tema",
+    "headingFont": "Fuente de título",
+    "bodyFont": "Fuente de cuerpo",
+    "unlinkTheme": "Desvincular del tema",
+    "applyThemeColor": "Aplicar un color del tema a este elemento:"
+  },
+  "export": {
+    "title": "Exportar Diseño",
+    "description": "Elige tu formato de exportación y configuración",
+    "format": "Formato",
+    "resolution": "Resolución",
+    "resolutionHint": "Mayor resolución para calidad de impresión",
+    "includeBack": "Incluir reverso",
+    "printInfo": "Frente y reverso se colocarán en una sola página PDF, lista para impresión a doble cara.",
+    "printOptions": "Opciones de Impresión",
+    "addBleed": "Agregar área de sangrado",
+    "addCropMarks": "Agregar marcas de corte",
+    "emailSigInfo": "Edita los campos a continuación y copia la firma HTML para Gmail, Outlook o Apple Mail.",
+    "copySignature": "Copiar Firma HTML",
+    "copied": "¡Copiado!",
+    "exporting": "Exportando..."
+  },
+  "score": {
+    "designScore": "Puntuación de Diseño",
+    "excellent": "¡Excelente diseño! Tu tarjeta sigue las mejores prácticas.",
+    "good": "Buen diseño con áreas por mejorar.",
+    "fair": "Diseño aceptable. Revisa las sugerencias a continuación.",
+    "needsWork": "Necesita mejoras."
+  },
+  "autoSave": {
+    "draftFound": "Borrador no guardado encontrado. ¿Restaurar?",
+    "restore": "Restaurar",
+    "dismiss": "Descartar",
+    "draftSaved": "Borrador guardado"
+  },
+  "embed": {
+    "title": "Incrustar Tarjeta",
+    "description": "Genera HTML para incrustar tu tarjeta de contacto en cualquier sitio web",
+    "staticImage": "Imagen Estática",
+    "interactive": "HTML Interactivo",
+    "copyEmbed": "Copiar Código de Incrustación"
+  },
+  "qrGenerator": {
+    "title": "Generador de QR de Contacto",
+    "contactDetails": "Detalles de Contacto",
+    "generate": "Generar Código QR",
+    "downloadPng": "Descargar PNG",
+    "downloadVCard": "Descargar vCard"
+  }
+}

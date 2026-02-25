@@ -2,8 +2,8 @@
 
 import { useDesignStore } from '@/store/design-store';
 import { generateId } from '@/lib/utils';
-import { Square, Circle, Triangle, Minus, Star, QrCode } from 'lucide-react';
-import { useState } from 'react';
+import { Square, Circle, Triangle, Minus, Star, QrCode, Hexagon, Upload } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -13,6 +13,7 @@ const shapes = [
   { type: 'triangle', label: 'Triangle', icon: Triangle },
   { type: 'line', label: 'Line', icon: Minus },
   { type: 'star', label: 'Star', icon: Star },
+  { type: 'polygon', label: 'Polygon', icon: Hexagon },
 ];
 
 export function ElementsPanel() {
@@ -33,11 +34,43 @@ export function ElementsPanel() {
       locked: false,
       visible: true,
       zIndex: 0,
-      shapeType: shapeType as 'rectangle' | 'circle' | 'triangle' | 'line' | 'star',
+      shapeType: shapeType as 'rectangle' | 'circle' | 'triangle' | 'line' | 'star' | 'polygon',
       fill: '#6366f1',
       strokeWidth: 0,
+      ...(shapeType === 'polygon' ? { sides: 6 } : {}),
     });
   };
+
+  const handleSVGUpload = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.svg';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const svgContent = ev.target?.result as string;
+        const dataUrl = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+        addElement({
+          type: 'image',
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 200,
+          rotation: 0,
+          opacity: 1,
+          locked: false,
+          visible: true,
+          zIndex: 0,
+          src: dataUrl,
+          objectFit: 'contain',
+        });
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }, [addElement]);
 
   const addQRCode = async () => {
     if (!qrUrl.trim()) return;
@@ -89,6 +122,15 @@ export function ElementsPanel() {
             </button>
           ))}
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleSVGUpload}
+          className="w-full mt-2"
+          leftIcon={<Upload className="w-4 h-4" />}
+        >
+          Upload SVG
+        </Button>
       </div>
 
       {/* QR Code */}

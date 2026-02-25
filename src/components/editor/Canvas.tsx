@@ -5,23 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDesignStore, resolveElementStyles } from '@/store/design-store';
 import { DesignElement, CanvasBackground } from '@/types';
 import { cn } from '@/lib/utils';
+import { AlignmentToolbar } from './AlignmentToolbar';
+import { getAutoShrinkFontSize, isTextOverflowing } from '@/lib/textResizing';
 
 interface CanvasElementProps {
   element: DesignElement;
   isSelected: boolean;
+  isMultiSelected: boolean;
   zoom: number;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, additive?: boolean) => void;
   onUpdate: (id: string, updates: Partial<DesignElement>) => void;
 }
 
-function CanvasElement({ element, isSelected, zoom, onSelect, onUpdate }: CanvasElementProps) {
+function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, onUpdate }: CanvasElementProps) {
   const dragStartRef = useRef<{ x: number; y: number; elX: number; elY: number } | null>(null);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (element.locked) return;
       e.stopPropagation();
-      onSelect(element.id);
+      onSelect(element.id, e.shiftKey);
 
       const startX = e.clientX;
       const startY = e.clientY;
@@ -93,29 +96,45 @@ function CanvasElement({ element, isSelected, zoom, onSelect, onUpdate }: Canvas
 
   const renderContent = () => {
     switch (element.type) {
-      case 'text':
+      case 'text': {
+        const effectiveFontSize = element.autoShrink
+          ? getAutoShrinkFontSize(element)
+          : (element.fontSize ?? 16);
+        const showOverflow = !element.autoShrink && isTextOverflowing(element);
+
         return (
-          <div
-            style={{
-              fontFamily: element.fontFamily ?? 'Inter',
-              fontSize: element.fontSize ?? 16,
-              fontWeight: element.fontWeight ?? '400',
-              fontStyle: element.fontStyle ?? 'normal',
-              textDecoration: element.textDecoration ?? 'none',
-              textAlign: element.textAlign ?? 'left',
-              color: element.color ?? '#000000',
-              lineHeight: element.lineHeight ?? 1.4,
-              letterSpacing: element.letterSpacing ? `${element.letterSpacing}px` : 'normal',
-              width: '100%',
-              height: '100%',
-              overflow: 'hidden',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            {element.content ?? 'Text'}
-          </div>
+          <>
+            <div
+              style={{
+                fontFamily: element.fontFamily ?? 'Inter',
+                fontSize: effectiveFontSize,
+                fontWeight: element.fontWeight ?? '400',
+                fontStyle: element.fontStyle ?? 'normal',
+                textDecoration: element.textDecoration ?? 'none',
+                textAlign: element.textAlign ?? 'left',
+                color: element.color ?? '#000000',
+                lineHeight: element.lineHeight ?? 1.4,
+                letterSpacing: element.letterSpacing ? `${element.letterSpacing}px` : 'normal',
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
+              {element.content ?? 'Text'}
+            </div>
+            {showOverflow && (
+              <div
+                className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
+                title="Text overflows – adjust font size or enable auto-shrink"
+              >
+                !
+              </div>
+            )}
+          </>
         );
+      }
 
       case 'image':
         return element.src ? (
@@ -150,6 +169,38 @@ function CanvasElement({ element, isSelected, zoom, onSelect, onUpdate }: Canvas
       case 'shape':
         return null;
 
+      case 'group':
+        return (
+          <div className="w-full h-full relative border-2 border-dashed border-blue-300 rounded-sm">
+            {element.children?.map((child) => (
+              <div
+                key={child.id}
+                style={{
+                  position: 'absolute',
+                  left: child.x,
+                  top: child.y,
+                  width: child.width,
+                  height: child.height,
+                  opacity: child.opacity ?? 1,
+                  backgroundColor: child.type === 'shape' ? child.fill ?? '#6366f1' : undefined,
+                  borderRadius: child.type === 'shape' && child.shapeType === 'circle' ? '50%' : child.borderRadius ?? 0,
+                  fontSize: child.fontSize ?? 16,
+                  fontFamily: child.fontFamily ?? 'Inter',
+                  color: child.color ?? '#000000',
+                  fontWeight: child.fontWeight ?? '400',
+                  textAlign: child.textAlign ?? 'left',
+                  lineHeight: child.lineHeight ?? 1.4,
+                  overflow: 'hidden',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {child.type === 'text' && (child.content ?? 'Text')}
+              </div>
+            ))}
+          </div>
+        );
+
       default:
         return null;
     }
@@ -159,7 +210,10 @@ function CanvasElement({ element, isSelected, zoom, onSelect, onUpdate }: Canvas
     <div
       style={elementStyle}
       onMouseDown={handleMouseDown}
-      className={cn(isSelected && 'ring-2 ring-indigo-500 ring-offset-1')}
+      className={cn(
+        isSelected && 'ring-2 ring-indigo-500 ring-offset-1',
+        isMultiSelected && !isSelected && 'ring-2 ring-blue-400 ring-offset-1'
+      )}
     >
       {renderContent()}
 
@@ -301,8 +355,8 @@ interface CanvasProps {
 
 export function Canvas({ exportRef, splitView }: CanvasProps) {
   const {
-    elements, selectedElementId, background, zoom, canvasWidth, canvasHeight,
-    selectElement, updateElement, currentSide, isDoubleSided, globalStyles,
+    elements, selectedElementId, selectedElementIds, background, zoom, canvasWidth, canvasHeight,
+    selectElement, toggleSelectElement, updateElement, currentSide, isDoubleSided, globalStyles,
     frontLayers, backLayers, frontBackground, backBackground, setCurrentSide,
   } = useDesignStore();
 
@@ -326,6 +380,17 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
   const previewBackElements = currentSide === 'back' ? elements : backLayers;
   const previewFrontBg = currentSide === 'front' ? background : frontBackground;
   const previewBackBg = currentSide === 'back' ? background : backBackground;
+
+  const handleElementSelect = useCallback(
+    (id: string, additive?: boolean) => {
+      if (additive) {
+        toggleSelectElement(id);
+      } else {
+        selectElement(id);
+      }
+    },
+    [selectElement, toggleSelectElement]
+  );
 
   return (
     <div className="flex-1 canvas-workspace flex items-center justify-center overflow-auto p-8">
@@ -380,8 +445,9 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
                   key={element.id}
                   element={resolveElementStyles(element, globalStyles)}
                   isSelected={selectedElementId === element.id}
+                  isMultiSelected={selectedElementIds.includes(element.id)}
                   zoom={zoom}
-                  onSelect={selectElement}
+                  onSelect={handleElementSelect}
                   onUpdate={updateElement}
                 />
               ))}
@@ -406,6 +472,13 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
           </motion.div>
         </AnimatePresence>
       </motion.div>
+
+      {/* Alignment toolbar - floating above canvas when multi-selected */}
+      {selectedElementIds.length >= 2 && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <AlignmentToolbar />
+        </div>
+      )}
     </div>
   );
 }

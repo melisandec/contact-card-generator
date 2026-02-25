@@ -9,11 +9,18 @@ import { GlobalStylesPanel } from "@/components/editor/GlobalStylesPanel";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { ExportModal } from "@/components/editor/ExportModal";
 import { SaveModal } from "@/components/editor/SaveModal";
+import { ImportContactModal } from "@/components/editor/ImportContactModal";
+import { CRMPanel } from "@/components/editor/CRMPanel";
+import { EmbedModal } from "@/components/editor/EmbedModal";
+import { DesignScorePanel } from "@/components/editor/DesignScorePanel";
+import { HistorySlider } from "@/components/editor/HistorySlider";
+import { DimensionsPreset } from "@/components/editor/DimensionsPreset";
 import { useDesignStore } from "@/store/design-store";
 import { useUIStore } from "@/store/ui-store";
 import { useDesign } from "@/hooks/useDesign";
+import { useAutoSave } from "@/hooks/useAutoSave";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserPlus, Building2, Code2, CloudOff, Check } from "lucide-react";
 
 function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -21,6 +28,10 @@ function EditorContent() {
     "properties" | "globalStyles"
   >("properties");
   const [splitView, setSplitView] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [crmPanelOpen, setCrmPanelOpen] = useState(false);
+  const [embedModalOpen, setEmbedModalOpen] = useState(false);
+  const { lastSaved, draftAvailable, restoreDraft, dismissDraft } = useAutoSave();
   const {
     zoom,
     setZoom,
@@ -32,6 +43,8 @@ function EditorContent() {
     currentSide,
     setCurrentSide,
     isDoubleSided,
+    groupElements,
+    ungroupElements,
   } = useDesignStore();
   const { exportModalOpen } = useUIStore();
   const searchParams = useSearchParams();
@@ -91,12 +104,18 @@ function EditorContent() {
         if (isDoubleSided) {
           setCurrentSide(currentSide === "front" ? "back" : "front");
         }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "g" && !e.shiftKey) {
+        e.preventDefault();
+        groupElements();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "g" && e.shiftKey) {
+        e.preventDefault();
+        ungroupElements();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [zoom, setZoom, undo, redo, isDoubleSided, currentSide, setCurrentSide]);
+  }, [zoom, setZoom, undo, redo, isDoubleSided, currentSide, setCurrentSide, groupElements, ungroupElements]);
 
   if (designId && isDesignLoading) {
     return (
@@ -113,7 +132,33 @@ function EditorContent() {
       <Toolbar
         splitView={splitView}
         onToggleSplitView={() => setSplitView((v) => !v)}
-      />
+      >
+        {/* Integration buttons in toolbar */}
+        <button
+          onClick={() => setImportModalOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+          title="Import contact from vCard"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">Import</span>
+        </button>
+        <button
+          onClick={() => setCrmPanelOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+          title="Push to CRM"
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">CRM</span>
+        </button>
+        <button
+          onClick={() => setEmbedModalOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+          title="Generate embed code"
+        >
+          <Code2 className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">Embed</span>
+        </button>
+      </Toolbar>
 
       {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
@@ -125,8 +170,23 @@ function EditorContent() {
           <Canvas exportRef={canvasRef} splitView={splitView} />
 
           {/* Status bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-7 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center px-3 gap-4 text-xs text-slate-500">
-            <StatusBarInfo />
+          <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-slate-200 flex flex-col">
+            {/* History slider */}
+            <div className="h-6 flex items-center border-b border-slate-100">
+              <HistorySlider />
+            </div>
+            <div className="h-7 flex items-center px-3 gap-4 text-xs text-slate-500">
+              <StatusBarInfo />
+              {lastSaved && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1 text-green-600">
+                    <Check className="w-3 h-3" />
+                    Draft saved
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         </main>
 
@@ -158,7 +218,13 @@ function EditorContent() {
           </div>
           <div className="flex-1 overflow-y-auto">
             {rightPanelTab === "properties" ? (
-              <PropertiesPanel />
+              <div className="space-y-0">
+                <PropertiesPanel />
+                {/* Design Score */}
+                <div className="px-3 py-3 border-t border-slate-100">
+                  <DesignScorePanel />
+                </div>
+              </div>
             ) : (
               <GlobalStylesPanel />
             )}
@@ -169,6 +235,29 @@ function EditorContent() {
       {/* Modals */}
       <ExportModal canvasRef={canvasRef} />
       <SaveModal />
+      <ImportContactModal open={importModalOpen} onOpenChange={setImportModalOpen} />
+      <CRMPanel open={crmPanelOpen} onOpenChange={setCrmPanelOpen} />
+      <EmbedModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} />
+
+      {/* Auto-save draft restore banner */}
+      {draftAvailable && (
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-amber-200 shadow-lg rounded-xl px-4 py-3 flex items-center gap-3">
+          <CloudOff className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <span className="text-sm text-slate-700">Unsaved draft found. Restore?</span>
+          <button
+            onClick={restoreDraft}
+            className="px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Restore
+          </button>
+          <button
+            onClick={dismissDraft}
+            className="px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -191,8 +280,6 @@ function StatusBarInfo() {
   const {
     elements,
     selectedElementId,
-    canvasWidth,
-    canvasHeight,
     zoom,
     currentSide,
     setCurrentSide,
@@ -202,9 +289,7 @@ function StatusBarInfo() {
 
   return (
     <>
-      <span>
-        {canvasWidth} × {canvasHeight}px
-      </span>
+      <DimensionsPreset />
       <span>•</span>
       <span>{Math.round(zoom * 100)}%</span>
       <span>•</span>

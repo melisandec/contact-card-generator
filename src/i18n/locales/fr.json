@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "export": "Exporter",
+    "cancel": "Annuler",
+    "apply": "Appliquer",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "clear": "Effacer le canevas",
+    "import": "Importer",
+    "embed": "Intégrer",
+    "copy": "Copier",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "back": "Retour"
+  },
+  "toolbar": {
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "hideGuides": "Masquer les règles et guides",
+    "showGuides": "Afficher les règles et guides",
+    "lockGuides": "Verrouiller les guides",
+    "unlockGuides": "Déverrouiller les guides",
+    "front": "Recto",
+    "backSide": "Verso",
+    "flipSide": "Retourner",
+    "clearConfirm": "Effacer tous les éléments ? Cette action est irréversible.",
+    "copyFrontToBack": "Copier le recto au verso",
+    "mirrorFrontOnBack": "Refléter le recto au verso",
+    "copyStyles": "Copier les styles de l'autre côté",
+    "showSplitView": "Afficher la vue divisée",
+    "hideSplitView": "Masquer la vue divisée"
+  },
+  "sidebar": {
+    "templates": "Modèles",
+    "elements": "Éléments",
+    "uploads": "Téléchargements",
+    "text": "Texte",
+    "background": "Fond",
+    "layers": "Calques"
+  },
+  "properties": {
+    "title": "Propriétés",
+    "globalStyles": "Styles Globaux",
+    "noElement": "Aucun élément sélectionné",
+    "noElementHint": "Cliquez sur un élément du canevas pour modifier ses propriétés",
+    "positionSize": "Position et Taille",
+    "textSection": "Texte",
+    "content": "Contenu",
+    "fontFamily": "Famille de Police",
+    "fontSize": "Taille de Police",
+    "textColor": "Couleur du Texte",
+    "autoShrink": "Réduire le texte automatiquement",
+    "autoShrinkHint": "Réduit la taille de police lorsque le texte déborde",
+    "shadow": "Ombre",
+    "styleFromTheme": "Style du Thème",
+    "headingFont": "Police de titre",
+    "bodyFont": "Police de corps",
+    "unlinkTheme": "Dissocier du thème",
+    "applyThemeColor": "Appliquer une couleur du thème à cet élément :"
+  },
+  "export": {
+    "title": "Exporter le Design",
+    "description": "Choisissez le format d'exportation et les paramètres",
+    "format": "Format",
+    "resolution": "Résolution",
+    "resolutionHint": "Résolution plus élevée pour la qualité d'impression",
+    "includeBack": "Inclure le verso",
+    "printInfo": "Le recto et le verso seront placés sur une seule page PDF, prête pour l'impression recto-verso.",
+    "printOptions": "Options d'Impression",
+    "addBleed": "Ajouter la zone de fond perdu",
+    "addCropMarks": "Ajouter les repères de coupe",
+    "emailSigInfo": "Modifiez les champs ci-dessous et copiez la signature HTML pour Gmail, Outlook ou Apple Mail.",
+    "copySignature": "Copier la Signature HTML",
+    "copied": "Copié !",
+    "exporting": "Exportation..."
+  },
+  "score": {
+    "designScore": "Score de Design",
+    "excellent": "Excellent design ! Votre carte suit les meilleures pratiques.",
+    "good": "Bon design avec des axes d'amélioration.",
+    "fair": "Design convenable. Consultez les suggestions ci-dessous.",
+    "needsWork": "Nécessite des améliorations."
+  },
+  "autoSave": {
+    "draftFound": "Brouillon non enregistré trouvé. Restaurer ?",
+    "restore": "Restaurer",
+    "dismiss": "Ignorer",
+    "draftSaved": "Brouillon enregistré"
+  },
+  "embed": {
+    "title": "Intégrer la Carte",
+    "description": "Générez du HTML pour intégrer votre carte de contact sur n'importe quel site web",
+    "staticImage": "Image Statique",
+    "interactive": "HTML Interactif",
+    "copyEmbed": "Copier le Code d'Intégration"
+  },
+  "qrGenerator": {
+    "title": "Générateur de QR Contact",
+    "contactDetails": "Coordonnées",
+    "generate": "Générer le Code QR",
+    "downloadPng": "Télécharger PNG",
+    "downloadVCard": "Télécharger vCard"
+  }
+}
