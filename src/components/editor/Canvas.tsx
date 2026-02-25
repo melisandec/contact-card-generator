@@ -189,7 +189,7 @@ interface CanvasProps {
 }
 
 export function Canvas({ exportRef }: CanvasProps) {
-  const { elements, selectedElementId, background, zoom, canvasWidth, canvasHeight, selectElement, updateElement } =
+  const { elements, selectedElementId, background, zoom, canvasWidth, canvasHeight, selectElement, updateElement, currentSide, isDoubleSided } =
     useDesignStore();
 
   const getBackgroundStyle = (): React.CSSProperties => {
@@ -247,6 +247,23 @@ export function Canvas({ exportRef }: CanvasProps) {
               onUpdate={updateElement}
             />
           ))}
+
+          {/* Empty back side prompt */}
+          {isDoubleSided && currentSide === 'back' && elements.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <p className="text-sm text-slate-400">Add elements to the back of your card.</p>
+                <p className="text-xs text-slate-300 mt-1">Use the sidebar to add text, shapes, or images.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Side indicator */}
+          {isDoubleSided && (
+            <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] font-medium px-2 py-0.5 rounded-full pointer-events-none">
+              {currentSide === 'front' ? 'Front side' : 'Back side'}
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

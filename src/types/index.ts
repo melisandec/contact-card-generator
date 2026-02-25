@@ -71,6 +71,11 @@ export interface Template {
   background: CanvasBackground;
   width: number;
   height: number;
+  // Double-sided support
+  frontLayers?: DesignElement[];
+  backLayers?: DesignElement[];
+  backBackground?: CanvasBackground;
+  isDoubleSided?: boolean;
 }
 
 export interface Design {

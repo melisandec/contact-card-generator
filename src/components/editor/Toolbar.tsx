@@ -12,12 +12,13 @@ import {
   Download,
   Trash2,
   ChevronDown,
+  FlipHorizontal2,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { clamp } from '@/lib/utils';
+import { clamp, cn } from '@/lib/utils';
 
 export function Toolbar() {
-  const { zoom, setZoom, undo, redo, clearCanvas, historyIndex, history } = useDesignStore();
+  const { zoom, setZoom, undo, redo, clearCanvas, historyIndex, history, currentSide, setCurrentSide, isDoubleSided } = useDesignStore();
   const { setExportModalOpen, setSaveModalOpen } = useUIStore();
 
   const canUndo = historyIndex > 0;
@@ -76,6 +77,47 @@ export function Toolbar() {
           <ZoomIn className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Side Switcher — visible when double-sided */}
+      {isDoubleSided && (
+        <>
+          <div className="h-5 w-px bg-slate-200" />
+          <div className="flex items-center gap-0.5 bg-slate-100 rounded-lg p-0.5">
+            <button
+              onClick={() => setCurrentSide('front')}
+              className={cn(
+                'px-3 py-1 rounded-md text-xs font-medium transition-colors',
+                currentSide === 'front'
+                  ? 'bg-white text-indigo-700 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              )}
+              title="Edit front side (Ctrl+F)"
+            >
+              Front
+            </button>
+            <button
+              onClick={() => setCurrentSide('back')}
+              className={cn(
+                'px-3 py-1 rounded-md text-xs font-medium transition-colors',
+                currentSide === 'back'
+                  ? 'bg-white text-indigo-700 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              )}
+              title="Edit back side (Ctrl+F)"
+            >
+              Back
+            </button>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setCurrentSide(currentSide === 'front' ? 'back' : 'front')}
+            title="Flip side (Ctrl+F)"
+          >
+            <FlipHorizontal2 className="w-4 h-4" />
+          </Button>
+        </>
+      )}
 
       <div className="h-5 w-px bg-slate-200" />
 
