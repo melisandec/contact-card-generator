@@ -3,16 +3,24 @@
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useUIStore } from '@/store/ui-store';
 import { useDesignStore } from '@/store/design-store';
-import { Download, Image, FileType, Printer } from 'lucide-react';
+import { Download, Image, FileType, Printer, Mail, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  generateEmailSignatureHTML,
+  generateEmailSignaturePlainText,
+  extractContactFromElements,
+  type EmailSignatureData,
+} from '@/lib/emailSignatureGenerator';
 
 const FORMATS = [
   { id: 'png', label: 'PNG', description: 'Best for web, transparent background', icon: Image },
   { id: 'jpg', label: 'JPG', description: 'Smaller file size, no transparency', icon: Image },
   { id: 'pdf', label: 'PDF', description: 'Perfect for printing', icon: FileType },
   { id: 'print-pdf', label: 'Print Sheet', description: 'Front & back on one page', icon: Printer },
+  { id: 'email-sig', label: 'Email Sig', description: 'HTML for email clients', icon: Mail },
 ] as const;
 
 type ExportFormat = typeof FORMATS[number]['id'];
@@ -23,11 +31,26 @@ interface ExportModalProps {
 
 export function ExportModal({ canvasRef }: ExportModalProps) {
   const { exportModalOpen, setExportModalOpen } = useUIStore();
-  const { canvasWidth, canvasHeight, isDoubleSided, currentSide, setCurrentSide } = useDesignStore();
+  const { canvasWidth, canvasHeight, isDoubleSided, currentSide, setCurrentSide, elements } = useDesignStore();
   const [format, setFormat] = useState<ExportFormat>('png');
   const [scale, setScale] = useState(2);
   const [isExporting, setIsExporting] = useState(false);
   const [includeBackSide, setIncludeBackSide] = useState(true);
+  const [emailSigCopied, setEmailSigCopied] = useState(false);
+
+  // Email signature data (editable)
+  const [emailSigData, setEmailSigData] = useState<EmailSignatureData>(() =>
+    extractContactFromElements(elements)
+  );
+
+  // Regenerate extracted data when modal opens with new elements
+  const [lastElementCount, setLastElementCount] = useState(0);
+  if (exportModalOpen && elements.length !== lastElementCount) {
+    setLastElementCount(elements.length);
+    if (format === 'email-sig') {
+      setEmailSigData(extractContactFromElements(elements));
+    }
+  }
 
   const captureCanvas = async (html2canvas: typeof import('html2canvas').default) => {
     if (!canvasRef.current) return null;
@@ -41,7 +64,32 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
     });
   };
 
+  const handleCopyEmailSig = async () => {
+    const html = generateEmailSignatureHTML(emailSigData);
+    try {
+      await navigator.clipboard.writeText(html);
+      setEmailSigCopied(true);
+      setTimeout(() => setEmailSigCopied(false), 2000);
+    } catch {
+      // Fallback: create textarea and copy
+      const ta = document.createElement('textarea');
+      ta.value = html;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setEmailSigCopied(true);
+      setTimeout(() => setEmailSigCopied(false), 2000);
+    }
+  };
+
   const handleExport = async () => {
+    // Email signature has its own flow (copy, not download)
+    if (format === 'email-sig') {
+      await handleCopyEmailSig();
+      return;
+    }
+
     if (!canvasRef.current) return;
     setIsExporting(true);
 
@@ -148,7 +196,7 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
     }
   };
 
-  const displayFormat = format === 'print-pdf' ? 'PRINT PDF' : format.toUpperCase();
+  const displayFormat = format === 'print-pdf' ? 'PRINT PDF' : format === 'email-sig' ? 'EMAIL SIG' : format.toUpperCase();
 
   return (
     <Modal
@@ -156,16 +204,22 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
       onOpenChange={setExportModalOpen}
       title="Export Design"
       description="Choose your export format and settings"
+      size={format === 'email-sig' ? 'xl' : 'md'}
     >
       <div className="space-y-4">
         {/* Format selection */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Format</label>
-          <div className={cn('grid gap-2', isDoubleSided ? 'grid-cols-4' : 'grid-cols-3')}>
+          <div className="grid gap-2 grid-cols-5">
             {FORMATS.filter((f) => isDoubleSided || f.id !== 'print-pdf').map(({ id, label, description, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => setFormat(id)}
+                onClick={() => {
+                  setFormat(id);
+                  if (id === 'email-sig') {
+                    setEmailSigData(extractContactFromElements(elements));
+                  }
+                }}
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-colors text-sm',
                   format === id
@@ -181,7 +235,8 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           </div>
         </div>
 
-        {/* Resolution */}
+        {/* Resolution — hide for email sig */}
+        {format !== 'email-sig' && (
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
             Resolution — {Math.round(canvasWidth * scale)} × {Math.round(canvasHeight * scale)}px
@@ -204,9 +259,10 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           </div>
           <p className="text-xs text-slate-400 mt-1">Higher resolution for print quality</p>
         </div>
+        )}
 
         {/* Include back side checkbox — only for double-sided designs and non-print-pdf */}
-        {isDoubleSided && format !== 'print-pdf' && (
+        {isDoubleSided && format !== 'print-pdf' && format !== 'email-sig' && (
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -231,14 +287,78 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           </div>
         )}
 
+        {/* Email Signature Editor */}
+        {format === 'email-sig' && (
+          <div className="space-y-3">
+            <div className="bg-violet-50 border border-violet-100 rounded-lg p-3 text-xs text-violet-700">
+              Edit the fields below and copy the HTML signature for Gmail, Outlook, or Apple Mail.
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="Full Name"
+                value={emailSigData.fullName || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, fullName: e.target.value })}
+              />
+              <Input
+                label="Title"
+                value={emailSigData.title || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, title: e.target.value })}
+              />
+              <Input
+                label="Company"
+                value={emailSigData.company || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, company: e.target.value })}
+              />
+              <Input
+                label="Email"
+                value={emailSigData.email || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, email: e.target.value })}
+              />
+              <Input
+                label="Phone"
+                value={emailSigData.phone || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, phone: e.target.value })}
+              />
+              <Input
+                label="Website"
+                value={emailSigData.website || ''}
+                onChange={(e) => setEmailSigData({ ...emailSigData, website: e.target.value })}
+              />
+            </div>
+
+            {/* HTML Preview */}
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Preview</label>
+              <div
+                className="border border-slate-200 rounded-lg p-4 bg-white overflow-auto max-h-40"
+                dangerouslySetInnerHTML={{ __html: generateEmailSignatureHTML(emailSigData) }}
+              />
+            </div>
+
+            {/* Plain text version */}
+            <details className="text-xs text-slate-500">
+              <summary className="cursor-pointer hover:text-slate-700">Plain text version</summary>
+              <pre className="mt-1 p-2 bg-slate-50 rounded text-xs whitespace-pre-wrap">
+                {generateEmailSignaturePlainText(emailSigData)}
+              </pre>
+            </details>
+          </div>
+        )}
+
         <Button
           className="w-full"
           size="lg"
           onClick={handleExport}
           loading={isExporting}
-          leftIcon={<Download className="w-5 h-5" />}
+          leftIcon={format === 'email-sig'
+            ? (emailSigCopied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />)
+            : <Download className="w-5 h-5" />
+          }
         >
-          {isExporting ? 'Exporting...' : `Export as ${displayFormat}`}
+          {format === 'email-sig'
+            ? (emailSigCopied ? 'Copied!' : 'Copy HTML Signature')
+            : isExporting ? 'Exporting...' : `Export as ${displayFormat}`
+          }
         </Button>
       </div>
     </Modal>

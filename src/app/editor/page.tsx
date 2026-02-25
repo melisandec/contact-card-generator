@@ -9,11 +9,13 @@ import { GlobalStylesPanel } from "@/components/editor/GlobalStylesPanel";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { ExportModal } from "@/components/editor/ExportModal";
 import { SaveModal } from "@/components/editor/SaveModal";
+import { ImportContactModal } from "@/components/editor/ImportContactModal";
+import { CRMPanel } from "@/components/editor/CRMPanel";
 import { useDesignStore } from "@/store/design-store";
 import { useUIStore } from "@/store/ui-store";
 import { useDesign } from "@/hooks/useDesign";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserPlus, Building2 } from "lucide-react";
 
 function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -21,6 +23,8 @@ function EditorContent() {
     "properties" | "globalStyles"
   >("properties");
   const [splitView, setSplitView] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [crmPanelOpen, setCrmPanelOpen] = useState(false);
   const {
     zoom,
     setZoom,
@@ -121,7 +125,25 @@ function EditorContent() {
       <Toolbar
         splitView={splitView}
         onToggleSplitView={() => setSplitView((v) => !v)}
-      />
+      >
+        {/* Integration buttons in toolbar */}
+        <button
+          onClick={() => setImportModalOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+          title="Import contact from vCard"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">Import</span>
+        </button>
+        <button
+          onClick={() => setCrmPanelOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+          title="Push to CRM"
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">CRM</span>
+        </button>
+      </Toolbar>
 
       {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
@@ -177,6 +199,8 @@ function EditorContent() {
       {/* Modals */}
       <ExportModal canvasRef={canvasRef} />
       <SaveModal />
+      <ImportContactModal open={importModalOpen} onOpenChange={setImportModalOpen} />
+      <CRMPanel open={crmPanelOpen} onOpenChange={setCrmPanelOpen} />
     </div>
   );
 }

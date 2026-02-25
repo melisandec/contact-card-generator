@@ -25,9 +25,10 @@ import { clamp, cn } from '@/lib/utils';
 interface ToolbarProps {
   splitView?: boolean;
   onToggleSplitView?: () => void;
+  children?: React.ReactNode;
 }
 
-export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
+export function Toolbar({ splitView, onToggleSplitView, children }: ToolbarProps) {
   const {
     zoom, setZoom, undo, redo, clearCanvas, historyIndex, history,
     currentSide, setCurrentSide, isDoubleSided,
@@ -227,6 +228,18 @@ export function Toolbar({ splitView, onToggleSplitView }: ToolbarProps) {
       </Button>
 
       <div className="flex-1" />
+
+      {/* Custom toolbar children (Import, CRM, etc.) */}
+      {children && (
+        <>
+          <div className="h-5 w-px bg-slate-200" />
+          <div className="flex items-center gap-0.5">
+            {children}
+          </div>
+        </>
+      )}
+
+      <div className="h-5 w-px bg-slate-200" />
 
       {/* Save */}
       <Button
