@@ -14,7 +14,7 @@ export interface GlobalStyles {
 
 export interface StyleRefs {
   colorRef?: string;
-  fontRef?: 'heading' | 'body';
+  fontRef?: "heading" | "body";
   overrides?: {
     fontSize?: number;
     letterSpacing?: number;
@@ -23,7 +23,7 @@ export interface StyleRefs {
 
 export interface DesignElement {
   id: string;
-  type: 'text' | 'image' | 'shape' | 'qrcode' | 'icon';
+  type: "text" | "image" | "shape" | "qrcode" | "icon";
   x: number;
   y: number;
   width: number;
@@ -44,13 +44,13 @@ export interface DesignElement {
   fontWeight?: string;
   fontStyle?: string;
   textDecoration?: string;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: "left" | "center" | "right";
   color?: string;
   lineHeight?: number;
   letterSpacing?: number;
 
   // Shape properties
-  shapeType?: 'rectangle' | 'circle' | 'triangle' | 'line' | 'star';
+  shapeType?: "rectangle" | "circle" | "triangle" | "line" | "star";
   fill?: string;
   stroke?: string;
   strokeWidth?: number;
@@ -58,7 +58,7 @@ export interface DesignElement {
 
   // Image properties
   src?: string;
-  objectFit?: 'cover' | 'contain' | 'fill';
+  objectFit?: "cover" | "contain" | "fill";
 
   // Shadow
   shadowColor?: string;
@@ -77,10 +77,10 @@ export interface DesignElement {
 }
 
 export interface CanvasBackground {
-  type: 'solid' | 'gradient' | 'image' | 'pattern';
+  type: "solid" | "gradient" | "image" | "pattern";
   color?: string;
   gradient?: {
-    type: 'linear' | 'radial';
+    type: "linear" | "radial";
     angle?: number;
     stops: Array<{ color: string; position: number }>;
   };
@@ -126,6 +126,46 @@ export interface Design {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  folderId?: string | null;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  color: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { designs: number };
+}
+
+export interface DesignCollaborator {
+  id: string;
+  designId: string;
+  userId: string;
+  role: "viewer" | "editor";
+  createdAt: string;
+  user?: {
+    id: string;
+    email: string;
+    name?: string;
+    image?: string;
+  };
+}
+
+export interface DesignVersion {
+  id: string;
+  designId: string;
+  version: number;
+  name?: string;
+  data: unknown;
+  frontLayers?: unknown;
+  backLayers?: unknown;
+  isDoubleSided: boolean;
+  width: number;
+  height: number;
+  createdAt: string;
+  createdBy?: string;
 }
 
 export interface User {
@@ -139,14 +179,20 @@ export interface User {
 }
 
 export interface ExportOptions {
-  format: 'png' | 'jpg' | 'pdf' | 'svg';
+  format: "png" | "jpg" | "pdf" | "svg";
   quality: number;
   scale: number;
   width?: number;
   height?: number;
 }
 
-export type SidebarTab = 'templates' | 'elements' | 'uploads' | 'text' | 'background' | 'layers';
+export type SidebarTab =
+  | "templates"
+  | "elements"
+  | "uploads"
+  | "text"
+  | "background"
+  | "layers";
 
 export interface ColorStop {
   color: string;
@@ -156,19 +202,19 @@ export interface ColorStop {
 // QR Contact Types
 
 export interface ContactPhone {
-  type: 'work' | 'home' | 'mobile' | 'fax' | 'pager' | 'other';
+  type: "work" | "home" | "mobile" | "fax" | "pager" | "other";
   number: string;
   preferred?: boolean;
 }
 
 export interface ContactEmail {
-  type: 'work' | 'home' | 'personal' | 'other';
+  type: "work" | "home" | "personal" | "other";
   address: string;
   preferred?: boolean;
 }
 
 export interface ContactAddress {
-  type: 'work' | 'home' | 'other';
+  type: "work" | "home" | "other";
   street: string;
   city: string;
   state: string;
@@ -177,12 +223,18 @@ export interface ContactAddress {
 }
 
 export interface ContactWebsite {
-  type: 'work' | 'personal' | 'portfolio' | 'other';
+  type: "work" | "personal" | "portfolio" | "other";
   url: string;
 }
 
 export interface ContactSocialMedia {
-  platform: 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'github' | 'other';
+  platform:
+    | "linkedin"
+    | "twitter"
+    | "instagram"
+    | "facebook"
+    | "github"
+    | "other";
   username: string;
   url?: string;
 }
@@ -217,10 +269,10 @@ export interface ContactData {
 }
 
 export interface QRContactOptions {
-  format: 'vcard' | 'mecard';
+  format: "vcard" | "mecard";
   encoding?: string;
   version?: string;
-  errorCorrection?: 'L' | 'M' | 'Q' | 'H';
+  errorCorrection?: "L" | "M" | "Q" | "H";
   margin?: number;
   foregroundColor?: string;
   backgroundColor?: string;

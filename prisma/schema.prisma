@@ -20,11 +20,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  designs  Design[]
-  assets   Asset[]
-  settings Settings?
+  accounts      Account[]
+  sessions      Session[]
+  designs       Design[]
+  assets        Asset[]
+  settings      Settings?
+  folders       Folder[]
+  collaborations DesignCollaborator[]
 }
 
 model Account {
@@ -81,6 +83,7 @@ model Design {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   userId        String
+  folderId      String?
 
   // QR Contact fields
   qrSettings Json?
@@ -88,10 +91,62 @@ model Design {
   qrFormat   String?   @default("vcard")
   lastQRSync DateTime?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder        Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  collaborators DesignCollaborator[]
+  versions      DesignVersion[]
 
   @@index([userId])
   @@index([updatedAt])
+  @@index([folderId])
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#6366f1")
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designs Design[]
+
+  @@index([userId])
+}
+
+model DesignCollaborator {
+  id        String   @id @default(cuid())
+  designId  String
+  userId    String
+  role      String   @default("viewer") // "viewer" | "editor"
+  createdAt DateTime @default(now())
+
+  design Design @relation(fields: [designId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([designId, userId])
+  @@index([userId])
+}
+
+model DesignVersion {
+  id        String   @id @default(cuid())
+  designId  String
+  version   Int
+  name      String?
+  data      Json
+  frontLayers Json?
+  backLayers  Json?
+  isDoubleSided Boolean @default(false)
+  width     Int      @default(1050)
+  height    Int      @default(600)
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  design Design @relation(fields: [designId], references: [id], onDelete: Cascade)
+
+  @@index([designId])
+  @@index([createdAt])
 }
 
 model Asset {

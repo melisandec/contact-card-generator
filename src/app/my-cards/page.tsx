@@ -1,11 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useCallback } from 'react';
-import Link from 'next/link';
-import { useDesigns, duplicateDesign, deleteDesign } from '@/hooks/useDesign';
-import { DesignCard } from '@/components/my-cards/DesignCard';
-import { Button } from '@/components/ui/Button';
-import { Header } from '@/components/layout/Header';
+import { useState, useMemo, useCallback } from "react";
+import Link from "next/link";
+import {
+  useDesigns,
+  useFolders,
+  duplicateDesign,
+  deleteDesign,
+  moveDesignToFolder,
+} from "@/hooks/useDesign";
+import { DesignCard } from "@/components/my-cards/DesignCard";
+import { FolderPanel } from "@/components/my-cards/FolderPanel";
+import { ShareModal } from "@/components/my-cards/ShareModal";
+import { VersionHistoryModal } from "@/components/my-cards/VersionHistoryModal";
+import { Button } from "@/components/ui/Button";
+import { Header } from "@/components/layout/Header";
 import {
   Search,
   Plus,
@@ -16,26 +25,46 @@ import {
   Pencil,
   Copy,
   Trash2,
-} from 'lucide-react';
-import { debounce } from '@/lib/utils';
+  Download,
+  Share2,
+  History,
+} from "lucide-react";
+import { debounce } from "@/lib/utils";
 
-type SortOption = 'updatedAt' | 'createdAt' | 'name';
-type ViewMode = 'grid' | 'list';
+type SortOption = "updatedAt" | "createdAt" | "name";
+type ViewMode = "grid" | "list";
 
 export default function MyCardsPage() {
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortOption>('updatedAt');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOption>("updatedAt");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
+  // Share / Version modals
+  const [shareDesignId, setShareDesignId] = useState<string | null>(null);
+  const [versionDesignId, setVersionDesignId] = useState<string | null>(null);
+
+  // Export ZIP state
+  const [isExporting, setIsExporting] = useState(false);
 
   const { designs, total, isLoading, error, mutate } = useDesigns({
     search,
     sort,
   });
+  const { folders, mutate: mutateFolders } = useFolders();
+
+  // Filter designs by folder
+  const filteredDesigns = useMemo(() => {
+    if (selectedFolderId === null) return designs;
+    if (selectedFolderId === "uncategorized")
+      return designs.filter((d) => !d.folderId);
+    return designs.filter((d) => d.folderId === selectedFolderId);
+  }, [designs, selectedFolderId]);
 
   const debouncedSearch = useMemo(
     () => debounce((...args: unknown[]) => setSearch(args[0] as string), 300),
-    []
+    [],
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,10 +78,10 @@ export default function MyCardsPage() {
         await duplicateDesign(id);
         mutate();
       } catch (err) {
-        console.error('Failed to duplicate design:', err);
+        console.error("Failed to duplicate design:", err);
       }
     },
-    [mutate]
+    [mutate],
   );
 
   const handleDelete = useCallback(
@@ -61,11 +90,58 @@ export default function MyCardsPage() {
         await deleteDesign(id);
         mutate();
       } catch (err) {
-        console.error('Failed to delete design:', err);
+        console.error("Failed to delete design:", err);
       }
     },
-    [mutate]
+    [mutate],
   );
+
+  const handleMoveToFolder = useCallback(
+    async (designId: string, folderId: string | null) => {
+      try {
+        await moveDesignToFolder(designId, folderId);
+        mutate();
+        mutateFolders();
+      } catch (err) {
+        console.error("Failed to move design:", err);
+      }
+    },
+    [mutate, mutateFolders],
+  );
+
+  const handleExportAllZip = async () => {
+    setIsExporting(true);
+    try {
+      const res = await fetch("/api/designs/export");
+      if (!res.ok) throw new Error("Export failed");
+      const { designs: allDesigns } = await res.json();
+
+      // Dynamically import JSZip
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+
+      for (const design of allDesigns) {
+        const filename = `${design.name.replace(/[^a-zA-Z0-9-_ ]/g, "")}.json`;
+        zip.file(filename, JSON.stringify(design, null, 2));
+      }
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cardcrafter-designs-${new Date().toISOString().split("T")[0]}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export:", err);
+      alert("Failed to export designs. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const shareDesign = filteredDesigns.find((d) => d.id === shareDesignId);
+  const versionDesign = filteredDesigns.find((d) => d.id === versionDesignId);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -77,15 +153,39 @@ export default function MyCardsPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">My Cards</h1>
             <p className="text-sm text-slate-500 mt-1">
-              {total > 0 ? `${total} saved design${total !== 1 ? 's' : ''}` : 'Your saved designs will appear here'}
+              {total > 0
+                ? `${total} saved design${total !== 1 ? "s" : ""}`
+                : "Your saved designs will appear here"}
             </p>
           </div>
-          <Link href="/editor">
-            <Button leftIcon={<Plus className="w-4 h-4" />}>
-              Create New Card
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {total > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportAllZip}
+                disabled={isExporting}
+                loading={isExporting}
+                leftIcon={<Download className="w-4 h-4" />}
+              >
+                Export All
+              </Button>
+            )}
+            <Link href="/editor">
+              <Button leftIcon={<Plus className="w-4 h-4" />}>
+                Create New Card
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        {/* Folders */}
+        <FolderPanel
+          folders={folders}
+          selectedFolderId={selectedFolderId}
+          onSelectFolder={setSelectedFolderId}
+          onMutate={mutateFolders}
+        />
 
         {/* Search and controls */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -117,16 +217,16 @@ export default function MyCardsPage() {
             {/* View mode toggle */}
             <div className="flex border border-slate-200 rounded-lg overflow-hidden">
               <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600' : 'bg-white text-slate-400 hover:text-slate-600'}`}
+                onClick={() => setViewMode("grid")}
+                className={`p-2 ${viewMode === "grid" ? "bg-indigo-50 text-indigo-600" : "bg-white text-slate-400 hover:text-slate-600"}`}
                 aria-label="Grid view"
                 title="Grid view"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600' : 'bg-white text-slate-400 hover:text-slate-600'}`}
+                onClick={() => setViewMode("list")}
+                className={`p-2 ${viewMode === "list" ? "bg-indigo-50 text-indigo-600" : "bg-white text-slate-400 hover:text-slate-600"}`}
                 aria-label="List view"
                 title="List view"
               >
@@ -143,26 +243,39 @@ export default function MyCardsPage() {
           </div>
         ) : error ? (
           <div className="text-center py-20">
-            <p className="text-slate-500">Failed to load designs. Please try again.</p>
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => mutate()}>
+            <p className="text-slate-500">
+              Failed to load designs. Please try again.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => mutate()}
+            >
               Retry
             </Button>
           </div>
-        ) : designs.length === 0 ? (
+        ) : filteredDesigns.length === 0 ? (
           /* Empty state */
           <div className="text-center py-20">
             <div className="w-20 h-20 mx-auto bg-indigo-50 rounded-2xl flex items-center justify-center mb-6">
               <Layers className="w-10 h-10 text-indigo-400" />
             </div>
             <h2 className="text-lg font-semibold text-slate-800 mb-2">
-              {search ? 'No designs found' : 'No saved cards yet'}
+              {search
+                ? "No designs found"
+                : selectedFolderId
+                  ? "No designs in this folder"
+                  : "No saved cards yet"}
             </h2>
             <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
               {search
-                ? 'Try adjusting your search terms.'
-                : 'Create your first card to get started. Your designs will be saved here for easy access.'}
+                ? "Try adjusting your search terms."
+                : selectedFolderId
+                  ? "Move designs into this folder from the card menu."
+                  : "Create your first card to get started. Your designs will be saved here for easy access."}
             </p>
-            {!search && (
+            {!search && !selectedFolderId && (
               <Link href="/editor">
                 <Button leftIcon={<Plus className="w-4 h-4" />}>
                   Create Your First Card
@@ -170,22 +283,26 @@ export default function MyCardsPage() {
               </Link>
             )}
           </div>
-        ) : viewMode === 'grid' ? (
+        ) : viewMode === "grid" ? (
           /* Grid view */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {designs.map((design) => (
+            {filteredDesigns.map((design) => (
               <DesignCard
                 key={design.id}
                 design={design}
+                folders={folders}
                 onDuplicate={handleDuplicate}
                 onDelete={handleDelete}
+                onShare={(id) => setShareDesignId(id)}
+                onVersionHistory={(id) => setVersionDesignId(id)}
+                onMoveToFolder={handleMoveToFolder}
               />
             ))}
           </div>
         ) : (
           /* List view */
           <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
-            {designs.map((design) => (
+            {filteredDesigns.map((design) => (
               <div
                 key={design.id}
                 className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors"
@@ -208,18 +325,36 @@ export default function MyCardsPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-slate-800 truncate">{design.name}</h3>
+                  <h3 className="text-sm font-medium text-slate-800 truncate">
+                    {design.name}
+                  </h3>
                   <p className="text-xs text-slate-400">
-                    Edited {new Date(design.updatedAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
+                    Edited{" "}
+                    {new Date(design.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
 
                 {/* Badges */}
                 <div className="hidden sm:flex items-center gap-2">
+                  {design.folderId &&
+                    folders.length > 0 &&
+                    (() => {
+                      const folder = folders.find(
+                        (f) => f.id === design.folderId,
+                      );
+                      return folder ? (
+                        <span
+                          className="text-[10px] text-white px-1.5 py-0.5 rounded-full font-medium"
+                          style={{ backgroundColor: folder.color }}
+                        >
+                          {folder.name}
+                        </span>
+                      ) : null;
+                    })()}
                   {design.isDoubleSided && (
                     <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full font-medium">
                       2-sided
@@ -238,7 +373,12 @@ export default function MyCardsPage() {
                 {/* Actions */}
                 <div className="flex items-center gap-1">
                   <Link href={`/editor?id=${design.id}`}>
-                    <Button size="icon-sm" variant="ghost" title="Edit" aria-label={`Edit ${design.name}`}>
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      title="Edit"
+                      aria-label={`Edit ${design.name}`}
+                    >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
@@ -250,6 +390,24 @@ export default function MyCardsPage() {
                     aria-label={`Duplicate ${design.name}`}
                   >
                     <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    onClick={() => setShareDesignId(design.id)}
+                    title="Share"
+                    aria-label={`Share ${design.name}`}
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    onClick={() => setVersionDesignId(design.id)}
+                    title="Version history"
+                    aria-label={`Version history for ${design.name}`}
+                  >
+                    <History className="w-3.5 h-3.5" />
                   </Button>
                   <Button
                     size="icon-sm"
@@ -267,6 +425,31 @@ export default function MyCardsPage() {
           </div>
         )}
       </div>
+
+      {/* Share modal */}
+      {shareDesignId && shareDesign && (
+        <ShareModal
+          open={!!shareDesignId}
+          onOpenChange={(open) => {
+            if (!open) setShareDesignId(null);
+          }}
+          designId={shareDesignId}
+          designName={shareDesign.name}
+        />
+      )}
+
+      {/* Version history modal */}
+      {versionDesignId && versionDesign && (
+        <VersionHistoryModal
+          open={!!versionDesignId}
+          onOpenChange={(open) => {
+            if (!open) setVersionDesignId(null);
+          }}
+          designId={versionDesignId}
+          designName={versionDesign.name}
+          onRestore={() => mutate()}
+        />
+      )}
     </div>
   );
 }

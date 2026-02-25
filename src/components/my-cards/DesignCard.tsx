@@ -1,26 +1,47 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Design } from '@/types';
-import { Button } from '@/components/ui/Button';
-import { Pencil, Copy, Trash2, Layers } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import Link from "next/link";
+import { Design, Folder } from "@/types";
+import { Button } from "@/components/ui/Button";
+import {
+  Pencil,
+  Copy,
+  Trash2,
+  Layers,
+  Share2,
+  History,
+  FolderInput,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DesignCardProps {
   design: Design;
+  folders?: Folder[];
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  onShare?: (id: string) => void;
+  onVersionHistory?: (id: string) => void;
+  onMoveToFolder?: (designId: string, folderId: string | null) => void;
 }
 
-export function DesignCard({ design, onDuplicate, onDelete }: DesignCardProps) {
+export function DesignCard({
+  design,
+  folders = [],
+  onDuplicate,
+  onDelete,
+  onShare,
+  onVersionHistory,
+  onMoveToFolder,
+}: DesignCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showFolderMenu, setShowFolderMenu] = useState(false);
 
-  const formattedDate = new Date(design.updatedAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  const formattedDate = new Date(design.updatedAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 
   const handleDelete = () => {
@@ -36,8 +57,8 @@ export function DesignCard({ design, onDuplicate, onDelete }: DesignCardProps) {
   return (
     <div
       className={cn(
-        'group relative bg-white rounded-xl border border-slate-200 overflow-hidden transition-all duration-200',
-        isHovered && 'shadow-lg border-indigo-200 scale-[1.02]'
+        "group relative bg-white rounded-xl border border-slate-200 overflow-hidden transition-all duration-200",
+        isHovered && "shadow-lg border-indigo-200 scale-[1.02]",
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -70,12 +91,17 @@ export function DesignCard({ design, onDuplicate, onDelete }: DesignCardProps) {
         {/* Hover action bar */}
         <div
           className={cn(
-            'absolute inset-0 bg-black/40 flex items-center justify-center gap-2 transition-opacity duration-200',
-            isHovered ? 'opacity-100' : 'opacity-0'
+            "absolute inset-0 bg-black/40 flex items-center justify-center gap-2 transition-opacity duration-200",
+            isHovered ? "opacity-100" : "opacity-0",
           )}
         >
           <Link href={`/editor?id=${design.id}`}>
-            <Button size="sm" variant="default" title="Edit design" aria-label={`Edit ${design.name}`}>
+            <Button
+              size="sm"
+              variant="default"
+              title="Edit design"
+              aria-label={`Edit ${design.name}`}
+            >
               <Pencil className="w-3.5 h-3.5" />
               Edit
             </Button>
@@ -89,11 +115,74 @@ export function DesignCard({ design, onDuplicate, onDelete }: DesignCardProps) {
           >
             <Copy className="w-3.5 h-3.5" />
           </Button>
+          {onShare && (
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              onClick={() => onShare(design.id)}
+              title="Share design"
+              aria-label={`Share ${design.name}`}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          {onVersionHistory && (
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              onClick={() => onVersionHistory(design.id)}
+              title="Version history"
+              aria-label={`Version history for ${design.name}`}
+            >
+              <History className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          {onMoveToFolder && folders.length > 0 && (
+            <div className="relative">
+              <Button
+                size="icon-sm"
+                variant="secondary"
+                onClick={() => setShowFolderMenu(!showFolderMenu)}
+                title="Move to folder"
+              >
+                <FolderInput className="w-3.5 h-3.5" />
+              </Button>
+              {showFolderMenu && (
+                <div className="absolute top-full mt-1 right-0 bg-white border border-slate-200 rounded-lg shadow-xl z-20 min-w-[150px] py-1">
+                  <button
+                    onClick={() => {
+                      onMoveToFolder(design.id, null);
+                      setShowFolderMenu(false);
+                    }}
+                    className="w-full text-left px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+                  >
+                    No folder
+                  </button>
+                  {folders.map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        onMoveToFolder(design.id, f.id);
+                        setShowFolderMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: f.color }}
+                      />
+                      {f.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <Button
             size="icon-sm"
-            variant={confirmDelete ? 'destructive' : 'secondary'}
+            variant={confirmDelete ? "destructive" : "secondary"}
             onClick={handleDelete}
-            title={confirmDelete ? 'Click again to confirm' : 'Delete design'}
+            title={confirmDelete ? "Click again to confirm" : "Delete design"}
             aria-label={`Delete ${design.name}`}
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -103,22 +192,36 @@ export function DesignCard({ design, onDuplicate, onDelete }: DesignCardProps) {
 
       {/* Card info */}
       <div className="p-3">
-        <h3 className="text-sm font-medium text-slate-800 truncate" title={design.name}>
+        <h3
+          className="text-sm font-medium text-slate-800 truncate"
+          title={design.name}
+        >
           {design.name}
         </h3>
         <p className="text-xs text-slate-400 mt-0.5">Edited {formattedDate}</p>
-        {design.tags && design.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {design.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {design.folderId &&
+            folders.length > 0 &&
+            (() => {
+              const folder = folders.find((f) => f.id === design.folderId);
+              return folder ? (
+                <span
+                  className="text-[10px] text-white px-1.5 py-0.5 rounded-full font-medium"
+                  style={{ backgroundColor: folder.color }}
+                >
+                  {folder.name}
+                </span>
+              ) : null;
+            })()}
+          {design.tags?.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
