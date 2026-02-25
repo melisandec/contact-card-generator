@@ -35,7 +35,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Track profile action error:", error);
     return NextResponse.json(
-      { error: "Failed to track action" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to track action",
+      },
       { status: 500 },
     );
   }

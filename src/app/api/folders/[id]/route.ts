@@ -39,7 +39,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error("Failed to update folder:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to update folder",
+      },
       { status: 500 },
     );
   }
@@ -74,7 +77,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error("Failed to delete folder:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to delete folder",
+      },
       { status: 500 },
     );
   }

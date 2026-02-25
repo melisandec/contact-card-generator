@@ -72,7 +72,10 @@ export async function GET(
   } catch (error) {
     console.error("vCard download error:", error);
     return NextResponse.json(
-      { error: "Failed to generate vCard" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to generate vCard",
+      },
       { status: 500 },
     );
   }

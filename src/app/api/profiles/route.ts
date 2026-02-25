@@ -29,7 +29,10 @@ export async function GET() {
   } catch (error) {
     console.error("List profiles error:", error);
     return NextResponse.json(
-      { error: "Failed to list profiles" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to list profiles",
+      },
       { status: 500 },
     );
   }
@@ -118,7 +121,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Create profile error:", error);
     return NextResponse.json(
-      { error: "Failed to create profile" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to create profile",
+      },
       { status: 500 },
     );
   }

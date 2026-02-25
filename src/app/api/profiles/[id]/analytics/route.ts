@@ -76,7 +76,10 @@ export async function GET(
   } catch (error) {
     console.error("Analytics error:", error);
     return NextResponse.json(
-      { error: "Failed to get analytics" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to get analytics",
+      },
       { status: 500 },
     );
   }

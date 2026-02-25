@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession, signIn } from "next-auth/react";
 import { useDesignStore } from "@/store/design-store";
 import {
   useProfiles,
@@ -38,6 +39,8 @@ import {
   Download,
   Eye,
   Loader2,
+  LogIn,
+  AlertCircle,
 } from "lucide-react";
 
 const SOCIAL_PLATFORMS = [
@@ -67,6 +70,7 @@ const FONTS = [
 ];
 
 export function DigitalProfilePanel() {
+  const { data: session, status: authStatus } = useSession();
   const { profiles, mutate } = useProfiles();
   const { addElement, currentDesignId } = useDesignStore();
 
@@ -75,6 +79,7 @@ export function DigitalProfilePanel() {
   );
   const [isCreating, setIsCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [qrData, setQrData] = useState<{
     dataUrl: string;
     profileUrl: string;
@@ -139,6 +144,7 @@ export function DigitalProfilePanel() {
   const handleSave = async () => {
     if (!form.fullName.trim()) return;
     setSaving(true);
+    setError(null);
     try {
       if (selectedProfileId) {
         await updateProfile(selectedProfileId, {
@@ -155,6 +161,9 @@ export function DigitalProfilePanel() {
       }
       mutate();
     } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save profile";
+      setError(message);
       console.error("Save profile error:", err);
     } finally {
       setSaving(false);
@@ -239,6 +248,30 @@ export function DigitalProfilePanel() {
       ),
     }));
   };
+
+  // If not authenticated, show sign-in prompt
+  if (authStatus !== "loading" && !session) {
+    return (
+      <div className="p-3">
+        <div className="text-center py-8">
+          <LogIn className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+          <p className="text-sm font-medium text-slate-600 mb-1">
+            Sign in required
+          </p>
+          <p className="text-xs text-slate-400 mb-4">
+            Digital profiles are saved to your account. Sign in to create and
+            manage them.
+          </p>
+          <button
+            onClick={() => signIn()}
+            className="px-4 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // If not creating/editing, show profile list
   if (!isCreating && !selectedProfileId) {
@@ -629,6 +662,30 @@ export function DigitalProfilePanel() {
               ))}
             </select>
           </div>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="flex items-start gap-2 p-2.5 bg-red-50 border border-red-200 rounded-lg">
+          <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs text-red-700">{error}</p>
+            {error.toLowerCase().includes("unauthorized") && (
+              <button
+                onClick={() => signIn()}
+                className="mt-1 text-[10px] font-medium text-indigo-600 hover:text-indigo-700 underline"
+              >
+                Sign in to continue
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-600"
+          >
+            <span className="text-xs">×</span>
+          </button>
         </div>
       )}
 

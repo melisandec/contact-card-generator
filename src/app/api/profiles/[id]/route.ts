@@ -35,7 +35,9 @@ export async function GET(
   } catch (error) {
     console.error("Get profile error:", error);
     return NextResponse.json(
-      { error: "Failed to get profile" },
+      {
+        error: error instanceof Error ? error.message : "Failed to get profile",
+      },
       { status: 500 },
     );
   }
@@ -114,7 +116,10 @@ export async function PUT(
   } catch (error) {
     console.error("Update profile error:", error);
     return NextResponse.json(
-      { error: "Failed to update profile" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to update profile",
+      },
       { status: 500 },
     );
   }
@@ -152,7 +157,10 @@ export async function DELETE(
   } catch (error) {
     console.error("Delete profile error:", error);
     return NextResponse.json(
-      { error: "Failed to delete profile" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to delete profile",
+      },
       { status: 500 },
     );
   }
