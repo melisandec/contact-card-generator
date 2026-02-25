@@ -1,5 +1,5 @@
 import { useDesignStore } from '@/store/design-store';
-import type { DesignElement, CanvasBackground } from '@/types';
+import type { CanvasBackground } from '@/types';
 
 const defaultBackground: CanvasBackground = { type: 'solid', color: '#ffffff' };
 

@@ -17,13 +17,12 @@ export function generateEmbedSnippet(
   options: EmbedOptions
 ): string {
   const width = options.width || 525;
-  const height = options.height || 300;
 
   if (options.mode === 'static') {
-    return generateStaticEmbed(options, width, height);
+    return generateStaticEmbed(options, width);
   }
 
-  return generateInteractiveEmbed(elements, options, width, height);
+  return generateInteractiveEmbed(elements, options, width);
 }
 
 function escapeHtml(str: string): string {
@@ -37,8 +36,7 @@ function escapeHtml(str: string): string {
 
 function generateStaticEmbed(
   options: EmbedOptions,
-  width: number,
-  height: number
+  width: number
 ): string {
   const imgSrc = options.imageUrl || '';
   const linkUrl = options.linkUrl || '#';
@@ -65,8 +63,7 @@ function generateStaticEmbed(
 function generateInteractiveEmbed(
   elements: DesignElement[],
   options: EmbedOptions,
-  width: number,
-  height: number
+  width: number
 ): string {
   // Extract contact info from elements
   const textElements = elements
@@ -75,7 +72,7 @@ function generateInteractiveEmbed(
 
   let name = '';
   let title = '';
-  let details: string[] = [];
+  const details: string[] = [];
 
   for (const el of textElements) {
     const content = el.content?.trim() ?? '';

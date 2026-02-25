@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useDesignStore } from '@/store/design-store';
 import { analyzeDesign, type DesignScore } from '@/lib/designScorer';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 export function DesignScorePanel() {
   const { elements, background, canvasWidth, canvasHeight } = useDesignStore();

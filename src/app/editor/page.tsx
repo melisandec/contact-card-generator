@@ -280,8 +280,6 @@ function StatusBarInfo() {
   const {
     elements,
     selectedElementId,
-    canvasWidth,
-    canvasHeight,
     zoom,
     currentSide,
     setCurrentSide,
