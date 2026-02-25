@@ -86,4 +86,37 @@ describe('templates', () => {
     const realEstateTemplates = templates.filter((t) => t.category === 'real-estate');
     expect(realEstateTemplates.length).toBe(2);
   });
+
+  it('contains corp-double-01 double-sided template', () => {
+    const template = templates.find((t: Record<string, unknown>) => t.id === 'corp-double-01');
+    expect(template).toBeDefined();
+    expect(template!.name).toBe('Corporate Double-Sided');
+    expect(template!.category).toBe('corporate');
+    expect(template!.width).toBe(1050);
+    expect(template!.height).toBe(600);
+
+    const tpl = template as Record<string, unknown>;
+    expect(tpl.isDoubleSided).toBe(true);
+    expect(Array.isArray(tpl.frontLayers)).toBe(true);
+    expect(Array.isArray(tpl.backLayers)).toBe(true);
+    expect((tpl.frontLayers as unknown[]).length).toBeGreaterThan(0);
+    expect((tpl.backLayers as unknown[]).length).toBeGreaterThan(0);
+    expect(tpl.backBackground).toBeDefined();
+  });
+
+  it('double-sided template frontLayers and backLayers have required fields', () => {
+    const template = templates.find((t: Record<string, unknown>) => t.id === 'corp-double-01') as Record<string, unknown>;
+    const frontLayers = template.frontLayers as Array<Record<string, unknown>>;
+    const backLayers = template.backLayers as Array<Record<string, unknown>>;
+
+    [...frontLayers, ...backLayers].forEach((el) => {
+      expect(el.id).toBeTruthy();
+      expect(el.type).toBeTruthy();
+      expect(typeof el.x).toBe('number');
+      expect(typeof el.y).toBe('number');
+      expect(typeof el.width).toBe('number');
+      expect(typeof el.height).toBe('number');
+      expect(typeof el.zIndex).toBe('number');
+    });
+  });
 });

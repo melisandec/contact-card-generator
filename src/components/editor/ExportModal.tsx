@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { useUIStore } from '@/store/ui-store';
@@ -22,10 +22,23 @@ interface ExportModalProps {
 
 export function ExportModal({ canvasRef }: ExportModalProps) {
   const { exportModalOpen, setExportModalOpen } = useUIStore();
-  const { canvasWidth, canvasHeight } = useDesignStore();
+  const { canvasWidth, canvasHeight, isDoubleSided, currentSide, setCurrentSide } = useDesignStore();
   const [format, setFormat] = useState<ExportFormat>('png');
   const [scale, setScale] = useState(2);
   const [isExporting, setIsExporting] = useState(false);
+  const [includeBackSide, setIncludeBackSide] = useState(true);
+
+  const captureCanvas = async (html2canvas: typeof import('html2canvas').default) => {
+    if (!canvasRef.current) return null;
+    return html2canvas(canvasRef.current, {
+      scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      width: canvasWidth,
+      height: canvasHeight,
+    });
+  };
 
   const handleExport = async () => {
     if (!canvasRef.current) return;
@@ -34,30 +47,64 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
     try {
       const { default: html2canvas } = await import('html2canvas');
 
-      const canvas = await html2canvas(canvasRef.current, {
-        scale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        width: canvasWidth,
-        height: canvasHeight,
-      });
+      // Capture front side
+      const originalSide = currentSide;
+
+      // If we're on back side, switch to front first for capture
+      if (originalSide === 'back') {
+        setCurrentSide('front');
+        await new Promise((r) => setTimeout(r, 100));
+      }
+
+      const frontCanvas = await captureCanvas(html2canvas);
+
+      let backCanvas: HTMLCanvasElement | null = null;
+      if (isDoubleSided && includeBackSide) {
+        // Switch to back and capture
+        setCurrentSide('back');
+        await new Promise((r) => setTimeout(r, 100));
+        backCanvas = await captureCanvas(html2canvas);
+      }
+
+      // Restore original side
+      if (currentSide !== originalSide) {
+        setCurrentSide(originalSide);
+      }
+
+      if (!frontCanvas) {
+        throw new Error('Failed to capture canvas');
+      }
 
       if (format === 'png') {
-        const dataUrl = canvas.toDataURL('image/png');
-        downloadDataUrl(dataUrl, 'cardcrafter-design.png');
+        const dataUrl = frontCanvas.toDataURL('image/png');
+        downloadDataUrl(dataUrl, 'cardcrafter-design-front.png');
+        if (backCanvas) {
+          const backDataUrl = backCanvas.toDataURL('image/png');
+          downloadDataUrl(backDataUrl, 'cardcrafter-design-back.png');
+        }
       } else if (format === 'jpg') {
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-        downloadDataUrl(dataUrl, 'cardcrafter-design.jpg');
+        const dataUrl = frontCanvas.toDataURL('image/jpeg', 0.95);
+        downloadDataUrl(dataUrl, 'cardcrafter-design-front.jpg');
+        if (backCanvas) {
+          const backDataUrl = backCanvas.toDataURL('image/jpeg', 0.95);
+          downloadDataUrl(backDataUrl, 'cardcrafter-design-back.jpg');
+        }
       } else if (format === 'pdf') {
         const { jsPDF } = await import('jspdf');
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgData = frontCanvas.toDataURL('image/jpeg', 0.95);
         const pdf = new jsPDF({
           orientation: canvasWidth > canvasHeight ? 'landscape' : 'portrait',
           unit: 'px',
           format: [canvasWidth, canvasHeight],
         });
         pdf.addImage(imgData, 'JPEG', 0, 0, canvasWidth, canvasHeight);
+
+        if (backCanvas) {
+          pdf.addPage([canvasWidth, canvasHeight], canvasWidth > canvasHeight ? 'landscape' : 'portrait');
+          const backImgData = backCanvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(backImgData, 'JPEG', 0, 0, canvasWidth, canvasHeight);
+        }
+
         pdf.save('cardcrafter-design.pdf');
       }
 
@@ -124,6 +171,25 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
           </div>
           <p className="text-xs text-slate-400 mt-1">Higher resolution for print quality</p>
         </div>
+
+        {/* Include back side checkbox — only for double-sided designs */}
+        {isDoubleSided && (
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="includeBackSide"
+              checked={includeBackSide}
+              onChange={(e) => setIncludeBackSide(e.target.checked)}
+              className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            />
+            <label htmlFor="includeBackSide" className="text-sm text-slate-700">
+              Include back side
+              <span className="text-xs text-slate-400 ml-1">
+                {format === 'pdf' ? '(adds second page)' : '(downloads separate file)'}
+              </span>
+            </label>
+          </div>
+        )}
 
         <Button
           className="w-full"

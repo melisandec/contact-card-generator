@@ -224,4 +224,162 @@ describe('Design Store', () => {
       expect(state.isDirty).toBe(false);
     });
   });
+
+  describe('double-sided editing workflow', () => {
+    it('adds elements to front side and they persist after side switch', () => {
+      const { loadFullDesign } = useDesignStore.getState();
+
+      loadFullDesign({
+        id: 'wf-1',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Add an element to front
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 50,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
+        zIndex: 1,
+        content: 'Front new',
+      });
+
+      expect(useDesignStore.getState().elements).toHaveLength(2);
+
+      // Switch to back
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().elements).toHaveLength(0);
+
+      // Switch back to front — elements should persist
+      useDesignStore.getState().setCurrentSide('front');
+      expect(useDesignStore.getState().elements).toHaveLength(2);
+    });
+
+    it('adds elements to back side independently', () => {
+      const { loadFullDesign } = useDesignStore.getState();
+
+      loadFullDesign({
+        id: 'wf-2',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Switch to back
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().elements).toHaveLength(0);
+
+      // Add element to back
+      useDesignStore.getState().addElement({
+        type: 'text',
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 50,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
+        zIndex: 0,
+        content: 'Back only',
+      });
+
+      expect(useDesignStore.getState().elements).toHaveLength(1);
+
+      // Switch to front — should have original element
+      useDesignStore.getState().setCurrentSide('front');
+      expect(useDesignStore.getState().elements).toHaveLength(1);
+      expect(useDesignStore.getState().elements[0].id).toBe('test-1');
+    });
+
+    it('loadFullDesign with backgrounds loads correct backgrounds per side', () => {
+      const frontBg: CanvasBackground = { type: 'solid', color: '#ff0000' };
+      const backBg: CanvasBackground = { type: 'solid', color: '#0000ff' };
+
+      useDesignStore.getState().loadFullDesign({
+        id: 'wf-3',
+        frontLayers: [sampleElement],
+        backLayers: [sampleElement2],
+        frontBackground: frontBg,
+        backBackground: backBg,
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Front side should have red background
+      expect(useDesignStore.getState().background.color).toBe('#ff0000');
+
+      // Switch to back — should have blue background
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().background.color).toBe('#0000ff');
+
+      // Switch back to front
+      useDesignStore.getState().setCurrentSide('front');
+      expect(useDesignStore.getState().background.color).toBe('#ff0000');
+    });
+
+    it('setCurrentSide clears selection', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'wf-4',
+        frontLayers: [sampleElement],
+        backLayers: [sampleElement2],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Select an element on front
+      useDesignStore.getState().selectElement('test-1');
+      expect(useDesignStore.getState().selectedElementId).toBe('test-1');
+
+      // Switch to back — selection should be cleared
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().selectedElementId).toBeNull();
+    });
+
+    it('setCurrentSide resets history for the new side', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'wf-5',
+        frontLayers: [sampleElement],
+        backLayers: [sampleElement2],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Switch to back
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().historyIndex).toBe(0);
+      expect(useDesignStore.getState().history).toHaveLength(1);
+    });
+
+    it('disabling double-sided mode preserves state', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'wf-6',
+        frontLayers: [sampleElement],
+        backLayers: [sampleElement2],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().setIsDoubleSided(false);
+      expect(useDesignStore.getState().isDoubleSided).toBe(false);
+      expect(useDesignStore.getState().isDirty).toBe(true);
+      // Elements still intact
+      expect(useDesignStore.getState().elements).toHaveLength(1);
+    });
+  });
 });

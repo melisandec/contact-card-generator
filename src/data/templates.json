@@ -498,5 +498,38 @@
       { "id": "e13", "type": "text", "x": 60, "y": 550, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 12, "content": "COMPANY NAME", "fontFamily": "Montserrat", "fontSize": 14, "fontWeight": "600", "color": "#C5A572", "textAlign": "left" },
       { "id": "e14", "type": "text", "x": 600, "y": 550, "width": 350, "height": 20, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 13, "content": "INTERNATIONAL BUYER REPRESENTATION", "fontFamily": "Montserrat", "fontSize": 10, "fontWeight": "400", "color": "#718096", "textAlign": "left", "letterSpacing": 1 }
     ]
+  },
+  {
+    "id": "corp-double-01",
+    "name": "Corporate Double-Sided",
+    "category": "corporate",
+    "thumbnail": "https://picsum.photos/seed/corpd1/400/250",
+    "width": 1050,
+    "height": 600,
+    "isDoubleSided": true,
+    "background": { "type": "solid", "color": "#1e3a5f" },
+    "backBackground": { "type": "solid", "color": "#f8fafc" },
+    "elements": [
+      { "id": "f1", "type": "text", "x": 60, "y": 80, "width": 400, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "FULL NAME", "fontFamily": "Inter", "fontSize": 42, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "f2", "type": "text", "x": 60, "y": 150, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Job Title", "fontFamily": "Inter", "fontSize": 18, "fontWeight": "400", "color": "#93c5fd", "textAlign": "left" },
+      { "id": "f3", "type": "shape", "x": 60, "y": 200, "width": 60, "height": 3, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#3b82f6", "strokeWidth": 0 },
+      { "id": "f4", "type": "text", "x": 60, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "email@company.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "f5", "type": "text", "x": 60, "y": 390, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "+1 (555) 000-0000", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "f6", "type": "text", "x": 60, "y": 520, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 5, "content": "COMPANY NAME", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" }
+    ],
+    "frontLayers": [
+      { "id": "f1", "type": "text", "x": 60, "y": 80, "width": 400, "height": 60, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "FULL NAME", "fontFamily": "Inter", "fontSize": 42, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" },
+      { "id": "f2", "type": "text", "x": 60, "y": 150, "width": 300, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Job Title", "fontFamily": "Inter", "fontSize": 18, "fontWeight": "400", "color": "#93c5fd", "textAlign": "left" },
+      { "id": "f3", "type": "shape", "x": 60, "y": 200, "width": 60, "height": 3, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#3b82f6", "strokeWidth": 0 },
+      { "id": "f4", "type": "text", "x": 60, "y": 350, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "email@company.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "f5", "type": "text", "x": 60, "y": 390, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 4, "content": "+1 (555) 000-0000", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#bfdbfe", "textAlign": "left" },
+      { "id": "f6", "type": "text", "x": 60, "y": 520, "width": 300, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 5, "content": "COMPANY NAME", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "700", "color": "#ffffff", "textAlign": "left" }
+    ],
+    "backLayers": [
+      { "id": "b1", "type": "text", "x": 300, "y": 200, "width": 450, "height": 50, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 0, "content": "COMPANY NAME", "fontFamily": "Inter", "fontSize": 36, "fontWeight": "700", "color": "#1e3a5f", "textAlign": "center" },
+      { "id": "b2", "type": "text", "x": 300, "y": 260, "width": 450, "height": 30, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 1, "content": "Innovation · Excellence · Trust", "fontFamily": "Inter", "fontSize": 16, "fontWeight": "400", "color": "#64748b", "textAlign": "center" },
+      { "id": "b3", "type": "shape", "x": 475, "y": 310, "width": 100, "height": 3, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 2, "shapeType": "rectangle", "fill": "#3b82f6", "strokeWidth": 0 },
+      { "id": "b4", "type": "text", "x": 300, "y": 340, "width": 450, "height": 24, "rotation": 0, "opacity": 1, "locked": false, "visible": true, "zIndex": 3, "content": "www.company.com", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "400", "color": "#3b82f6", "textAlign": "center" }
+    ]
   }
 ]

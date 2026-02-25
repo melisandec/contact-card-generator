@@ -13,7 +13,7 @@ const CATEGORIES = ['all', 'corporate', 'creative', 'minimal', 'tech', 'social',
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export function TemplatesPanel() {
-  const { loadDesign } = useDesignStore();
+  const { loadDesign, loadFullDesign } = useDesignStore();
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
 
@@ -27,7 +27,19 @@ export function TemplatesPanel() {
   );
 
   const applyTemplate = (template: Template) => {
-    loadDesign(template.elements, template.background, template.width, template.height);
+    if (template.isDoubleSided && template.frontLayers && template.backLayers) {
+      loadFullDesign({
+        frontLayers: template.frontLayers,
+        backLayers: template.backLayers,
+        frontBackground: template.background,
+        backBackground: template.backBackground,
+        isDoubleSided: true,
+        width: template.width,
+        height: template.height,
+      });
+    } else {
+      loadDesign(template.elements, template.background, template.width, template.height);
+    }
   };
 
   return (
@@ -118,6 +130,14 @@ function TemplateCard({ template, onApply }: { template: Template; onApply: () =
           </div>
         ))}
       </div>
+
+      {/* Double-sided badge */}
+      {template.isDoubleSided && (
+        <span className="absolute top-1.5 right-1.5 bg-indigo-600 text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
+          2-sided
+        </span>
+      )}
+
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
         <Button
           size="sm"

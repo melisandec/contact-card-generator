@@ -69,12 +69,17 @@ function EditorContent() {
       } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
         e.preventDefault();
         setZoom(1);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        if (isDoubleSided) {
+          setCurrentSide(currentSide === 'front' ? 'back' : 'front');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [zoom, setZoom, undo, redo]);
+  }, [zoom, setZoom, undo, redo, isDoubleSided, currentSide, setCurrentSide]);
 
   if (designId && isDesignLoading) {
     return (
