@@ -13,12 +13,13 @@ import {
   Trash2,
   ChevronDown,
   FlipHorizontal2,
+  ArrowRightLeft,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
 
 export function Toolbar() {
-  const { zoom, setZoom, undo, redo, clearCanvas, historyIndex, history, currentSide, setCurrentSide, isDoubleSided } = useDesignStore();
+  const { zoom, setZoom, undo, redo, clearCanvas, historyIndex, history, currentSide, setCurrentSide, isDoubleSided, copyStylesToSide } = useDesignStore();
   const { setExportModalOpen, setSaveModalOpen } = useUIStore();
 
   const canUndo = historyIndex > 0;
@@ -115,6 +116,15 @@ export function Toolbar() {
             title="Flip side (Ctrl+F)"
           >
             <FlipHorizontal2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => copyStylesToSide()}
+            title="Copy styles to other side"
+          >
+            <ArrowRightLeft className="w-4 h-4" />
+            <span className="text-xs ml-1">Copy styles</span>
           </Button>
         </>
       )}

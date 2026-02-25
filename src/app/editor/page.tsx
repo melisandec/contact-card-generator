@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useRef, useEffect } from 'react';
+import { Suspense, useRef, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Canvas } from '@/components/editor/Canvas';
 import { Sidebar } from '@/components/editor/Sidebar';
 import { PropertiesPanel } from '@/components/editor/PropertiesPanel';
+import { GlobalStylesPanel } from '@/components/editor/GlobalStylesPanel';
 import { Toolbar } from '@/components/editor/Toolbar';
 import { ExportModal } from '@/components/editor/ExportModal';
 import { useDesignStore } from '@/store/design-store';
@@ -15,6 +16,7 @@ import { Loader2 } from 'lucide-react';
 
 function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [rightPanelTab, setRightPanelTab] = useState<'properties' | 'globalStyles'>('properties');
   const {
     zoom, setZoom, undo, redo, loadDesign, loadFullDesign, setCurrentDesignId,
     currentSide, setCurrentSide, isDoubleSided,
@@ -112,11 +114,32 @@ function EditorContent() {
 
         {/* Right properties panel */}
         <aside className="w-64 border-l border-slate-200 bg-white overflow-hidden flex flex-col">
-          <div className="px-3 py-2 border-b border-slate-100">
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Properties</h3>
+          <div className="px-3 py-2 border-b border-slate-100 flex items-center gap-1">
+            <button
+              onClick={() => setRightPanelTab('properties')}
+              className={cn(
+                'px-2 py-1 rounded text-xs font-semibold uppercase tracking-wider transition-colors',
+                rightPanelTab === 'properties'
+                  ? 'text-indigo-700 bg-indigo-50'
+                  : 'text-slate-400 hover:text-slate-600'
+              )}
+            >
+              Properties
+            </button>
+            <button
+              onClick={() => setRightPanelTab('globalStyles')}
+              className={cn(
+                'px-2 py-1 rounded text-xs font-semibold uppercase tracking-wider transition-colors',
+                rightPanelTab === 'globalStyles'
+                  ? 'text-indigo-700 bg-indigo-50'
+                  : 'text-slate-400 hover:text-slate-600'
+              )}
+            >
+              Global Styles
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <PropertiesPanel />
+            {rightPanelTab === 'properties' ? <PropertiesPanel /> : <GlobalStylesPanel />}
           </div>
         </aside>
       </div>

@@ -1,3 +1,26 @@
+export interface GlobalColor {
+  id: string;
+  value: string;
+  label: string;
+}
+
+export interface GlobalStyles {
+  colors: GlobalColor[];
+  fonts: {
+    heading: string;
+    body: string;
+  };
+}
+
+export interface StyleRefs {
+  colorRef?: string;
+  fontRef?: 'heading' | 'body';
+  overrides?: {
+    fontSize?: number;
+    letterSpacing?: number;
+  };
+}
+
 export interface DesignElement {
   id: string;
   type: 'text' | 'image' | 'shape' | 'qrcode' | 'icon';
@@ -10,6 +33,9 @@ export interface DesignElement {
   locked: boolean;
   visible: boolean;
   zIndex: number;
+
+  // Style references (global styles)
+  styleRefs?: StyleRefs;
 
   // Text properties
   content?: string;
@@ -90,6 +116,7 @@ export interface Design {
   };
   frontLayers?: DesignElement[];
   backLayers?: DesignElement[];
+  globalStyles?: GlobalStyles;
   isDoubleSided: boolean;
   width: number;
   height: number;

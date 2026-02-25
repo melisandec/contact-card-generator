@@ -21,11 +21,15 @@ import {
   Unlock,
   Eye,
   EyeOff,
+  Unlink2,
 } from 'lucide-react';
 import type { DesignElement } from '@/types';
 
 export function PropertiesPanel() {
-  const { elements, selectedElementId, updateElement, removeElement, duplicateElement } = useDesignStore();
+  const {
+    elements, selectedElementId, updateElement, removeElement, duplicateElement,
+    globalStyles, applyGlobalColorToElement, applyGlobalFontToElement, unlinkElementStyle,
+  } = useDesignStore();
   const [colorPickerTarget, setColorPickerTarget] = useState<'fill' | 'stroke' | 'color' | null>(null);
 
   const selected = elements.find((e) => e.id === selectedElementId);
@@ -265,6 +269,69 @@ export function PropertiesPanel() {
               value={selected.shadowOffsetY ?? 0}
               onChange={(e) => update({ shadowOffsetY: parseInt(e.target.value) || 0 })}
             />
+          </div>
+        </Section>
+
+        {/* Style from Theme */}
+        <Section title="Style from Theme">
+          <div className="space-y-2">
+            <p className="text-xs text-slate-400">Apply a theme color to this element:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {globalStyles.colors.map((gc) => (
+                <button
+                  key={gc.id}
+                  onClick={() => {
+                    const target = selected.type === 'text' ? 'color' : 'fill';
+                    applyGlobalColorToElement(selected.id, gc.id, target as 'color' | 'fill');
+                  }}
+                  className={cn(
+                    'w-6 h-6 rounded-md border-2 transition-all hover:scale-110',
+                    selected.styleRefs?.colorRef === gc.id
+                      ? 'border-indigo-500 ring-1 ring-indigo-300'
+                      : 'border-slate-200'
+                  )}
+                  style={{ backgroundColor: gc.value }}
+                  title={`${gc.label}: ${gc.value}`}
+                />
+              ))}
+            </div>
+
+            {selected.type === 'text' && (
+              <div className="flex gap-1.5 mt-1">
+                <button
+                  onClick={() => applyGlobalFontToElement(selected.id, 'heading')}
+                  className={cn(
+                    'flex-1 px-2 py-1 text-[10px] rounded border transition-colors',
+                    selected.styleRefs?.fontRef === 'heading'
+                      ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                      : 'border-slate-200 text-slate-500 hover:border-indigo-200'
+                  )}
+                >
+                  Heading font
+                </button>
+                <button
+                  onClick={() => applyGlobalFontToElement(selected.id, 'body')}
+                  className={cn(
+                    'flex-1 px-2 py-1 text-[10px] rounded border transition-colors',
+                    selected.styleRefs?.fontRef === 'body'
+                      ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                      : 'border-slate-200 text-slate-500 hover:border-indigo-200'
+                  )}
+                >
+                  Body font
+                </button>
+              </div>
+            )}
+
+            {selected.styleRefs && (selected.styleRefs.colorRef || selected.styleRefs.fontRef) && (
+              <button
+                onClick={() => unlinkElementStyle(selected.id)}
+                className="flex items-center gap-1 text-[10px] text-red-500 hover:text-red-600 transition-colors mt-1"
+              >
+                <Unlink2 className="w-3 h-3" />
+                Unlink from theme
+              </button>
+            )}
           </div>
         </Section>
       </div>

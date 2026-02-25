@@ -1,11 +1,22 @@
 import { create } from 'zustand';
-import { DesignElement, CanvasBackground } from '@/types';
+import { DesignElement, CanvasBackground, GlobalStyles } from '@/types';
 import { generateId } from '@/lib/utils';
 
 interface HistoryEntry {
   elements: DesignElement[];
   background: CanvasBackground;
 }
+
+const defaultGlobalStyles: GlobalStyles = {
+  colors: [
+    { id: 'primary', value: '#003153', label: 'Primary' },
+    { id: 'secondary', value: '#C5A572', label: 'Accent' },
+  ],
+  fonts: {
+    heading: 'Playfair Display',
+    body: 'Montserrat',
+  },
+};
 
 interface DesignState {
   // Current design ID (for re-edit)
@@ -28,6 +39,9 @@ interface DesignState {
   backBackground: CanvasBackground;
   currentSide: 'front' | 'back';
   isDoubleSided: boolean;
+
+  // Global styles
+  globalStyles: GlobalStyles;
 
   // Actions
   addElement: (element: Omit<DesignElement, 'id'>) => void;
@@ -55,10 +69,46 @@ interface DesignState {
     backLayers?: DesignElement[];
     frontBackground?: CanvasBackground;
     backBackground?: CanvasBackground;
+    globalStyles?: GlobalStyles;
     isDoubleSided: boolean;
     width: number;
     height: number;
   }) => void;
+
+  // Global styles actions
+  setGlobalStyles: (styles: GlobalStyles) => void;
+  setGlobalColor: (colorId: string, value: string) => void;
+  setGlobalFont: (fontType: 'heading' | 'body', fontFamily: string) => void;
+  addGlobalColor: (color: { id: string; value: string; label: string }) => void;
+  removeGlobalColor: (colorId: string) => void;
+  copyStylesToSide: () => void;
+  applyGlobalColorToElement: (elementId: string, colorId: string, target: 'color' | 'fill') => void;
+  applyGlobalFontToElement: (elementId: string, fontRef: 'heading' | 'body') => void;
+  unlinkElementStyle: (elementId: string) => void;
+}
+
+export function resolveElementStyles(element: DesignElement, globalStyles: GlobalStyles): DesignElement {
+  if (!element.styleRefs) return element;
+  const resolved = { ...element };
+  const { colorRef, fontRef, overrides } = element.styleRefs;
+  if (colorRef) {
+    const gc = globalStyles.colors.find((c) => c.id === colorRef);
+    if (gc) {
+      if (element.type === 'text') {
+        resolved.color = gc.value;
+      } else if (element.type === 'shape') {
+        resolved.fill = gc.value;
+      }
+    }
+  }
+  if (fontRef && element.type === 'text') {
+    resolved.fontFamily = globalStyles.fonts[fontRef];
+  }
+  if (overrides) {
+    if (overrides.fontSize !== undefined) resolved.fontSize = overrides.fontSize;
+    if (overrides.letterSpacing !== undefined) resolved.letterSpacing = overrides.letterSpacing;
+  }
+  return resolved;
 }
 
 const defaultBackground: CanvasBackground = {
@@ -85,6 +135,9 @@ export const useDesignStore = create<DesignState>()((set) => ({
     backBackground: defaultBackground,
     currentSide: 'front' as const,
     isDoubleSided: false,
+
+    // Global styles
+    globalStyles: defaultGlobalStyles,
 
     addElement: (elementData) =>
       set((state) => {
@@ -288,6 +341,7 @@ export const useDesignStore = create<DesignState>()((set) => ({
         backLayers: design.backLayers || [],
         frontBackground: design.frontBackground || defaultBackground,
         backBackground: design.backBackground || defaultBackground,
+        globalStyles: design.globalStyles || defaultGlobalStyles,
         isDoubleSided: design.isDoubleSided,
         elements: design.frontLayers,
         background: design.frontBackground || defaultBackground,
@@ -299,5 +353,95 @@ export const useDesignStore = create<DesignState>()((set) => ({
         historyIndex: 0,
         isDirty: false,
       }),
+
+    // Global styles actions
+    setGlobalStyles: (styles) => set({ globalStyles: styles, isDirty: true }),
+
+    setGlobalColor: (colorId, value) =>
+      set((state) => ({
+        globalStyles: {
+          ...state.globalStyles,
+          colors: state.globalStyles.colors.map((c) =>
+            c.id === colorId ? { ...c, value } : c
+          ),
+        },
+        isDirty: true,
+      })),
+
+    setGlobalFont: (fontType, fontFamily) =>
+      set((state) => ({
+        globalStyles: {
+          ...state.globalStyles,
+          fonts: { ...state.globalStyles.fonts, [fontType]: fontFamily },
+        },
+        isDirty: true,
+      })),
+
+    addGlobalColor: (color) =>
+      set((state) => ({
+        globalStyles: {
+          ...state.globalStyles,
+          colors: [...state.globalStyles.colors, color],
+        },
+        isDirty: true,
+      })),
+
+    removeGlobalColor: (colorId) =>
+      set((state) => ({
+        globalStyles: {
+          ...state.globalStyles,
+          colors: state.globalStyles.colors.filter((c) => c.id !== colorId),
+        },
+        isDirty: true,
+      })),
+
+    copyStylesToSide: () =>
+      set((state) => {
+        // Global styles are already shared across both sides.
+        // This action re-applies the current globalStyles (which is shared).
+        return { globalStyles: { ...state.globalStyles }, isDirty: true };
+      }),
+
+    applyGlobalColorToElement: (elementId, colorId, target) =>
+      set((state) => {
+        const gc = state.globalStyles.colors.find((c) => c.id === colorId);
+        if (!gc) return {};
+        return {
+          elements: state.elements.map((el) =>
+            el.id === elementId
+              ? {
+                  ...el,
+                  ...(target === 'color' ? { color: gc.value } : { fill: gc.value }),
+                  styleRefs: { ...el.styleRefs, colorRef: colorId },
+                }
+              : el
+          ),
+          isDirty: true,
+        };
+      }),
+
+    applyGlobalFontToElement: (elementId, fontRef) =>
+      set((state) => ({
+        elements: state.elements.map((el) =>
+          el.id === elementId
+            ? {
+                ...el,
+                fontFamily: state.globalStyles.fonts[fontRef],
+                styleRefs: { ...el.styleRefs, fontRef },
+              }
+            : el
+        ),
+        isDirty: true,
+      })),
+
+    unlinkElementStyle: (elementId) =>
+      set((state) => ({
+        elements: state.elements.map((el) =>
+          el.id === elementId
+            ? { ...el, styleRefs: undefined }
+            : el
+        ),
+        isDirty: true,
+      })),
   }));
 

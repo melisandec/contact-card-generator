@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useDesignStore } from '@/store/design-store';
+import { useDesignStore, resolveElementStyles } from '@/store/design-store';
 import { DesignElement } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -189,7 +189,7 @@ interface CanvasProps {
 }
 
 export function Canvas({ exportRef }: CanvasProps) {
-  const { elements, selectedElementId, background, zoom, canvasWidth, canvasHeight, selectElement, updateElement, currentSide, isDoubleSided } =
+  const { elements, selectedElementId, background, zoom, canvasWidth, canvasHeight, selectElement, updateElement, currentSide, isDoubleSided, globalStyles } =
     useDesignStore();
 
   const getBackgroundStyle = (): React.CSSProperties => {
@@ -240,7 +240,7 @@ export function Canvas({ exportRef }: CanvasProps) {
           {elements.map((element) => (
             <CanvasElement
               key={element.id}
-              element={element}
+              element={resolveElementStyles(element, globalStyles)}
               isSelected={selectedElementId === element.id}
               zoom={zoom}
               onSelect={selectElement}
