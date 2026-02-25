@@ -75,6 +75,10 @@ interface DesignState {
     height: number;
   }) => void;
 
+  // Copy / mirror actions
+  copyFrontToBack: () => void;
+  mirrorFrontToBack: () => void;
+
   // Global styles actions
   setGlobalStyles: (styles: GlobalStyles) => void;
   setGlobalColor: (colorId: string, value: string) => void;
@@ -352,6 +356,67 @@ export const useDesignStore = create<DesignState>()((set) => ({
         history: [{ elements: JSON.parse(JSON.stringify(design.frontLayers)), background: JSON.parse(JSON.stringify(design.frontBackground || defaultBackground)) }],
         historyIndex: 0,
         isDirty: false,
+      }),
+
+    // Copy / mirror actions
+    copyFrontToBack: () =>
+      set((state) => {
+        // Get the current front elements and background
+        const frontEls = state.currentSide === 'front' ? state.elements : state.frontLayers;
+        const frontBg = state.currentSide === 'front' ? state.background : state.frontBackground;
+        // Deep-copy elements with new IDs
+        const copiedElements: DesignElement[] = frontEls.map((el) => ({
+          ...JSON.parse(JSON.stringify(el)),
+          id: generateId(),
+        }));
+        const copiedBg: CanvasBackground = JSON.parse(JSON.stringify(frontBg));
+
+        if (state.currentSide === 'back') {
+          // We're currently editing back, so update elements directly
+          return {
+            elements: copiedElements,
+            background: copiedBg,
+            backLayers: copiedElements,
+            backBackground: copiedBg,
+            selectedElementId: null,
+            isDirty: true,
+          };
+        }
+        // Currently on front, just update backLayers
+        return {
+          backLayers: copiedElements,
+          backBackground: copiedBg,
+          isDirty: true,
+        };
+      }),
+
+    mirrorFrontToBack: () =>
+      set((state) => {
+        const frontEls = state.currentSide === 'front' ? state.elements : state.frontLayers;
+        const frontBg = state.currentSide === 'front' ? state.background : state.frontBackground;
+        // Deep-copy with horizontally mirrored x positions
+        const mirroredElements: DesignElement[] = frontEls.map((el) => ({
+          ...JSON.parse(JSON.stringify(el)),
+          id: generateId(),
+          x: state.canvasWidth - el.x - el.width,
+        }));
+        const copiedBg: CanvasBackground = JSON.parse(JSON.stringify(frontBg));
+
+        if (state.currentSide === 'back') {
+          return {
+            elements: mirroredElements,
+            background: copiedBg,
+            backLayers: mirroredElements,
+            backBackground: copiedBg,
+            selectedElementId: null,
+            isDirty: true,
+          };
+        }
+        return {
+          backLayers: mirroredElements,
+          backBackground: copiedBg,
+          isDirty: true,
+        };
       }),
 
     // Global styles actions

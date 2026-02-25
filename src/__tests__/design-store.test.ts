@@ -603,4 +603,88 @@ describe('Design Store', () => {
       expect(state.globalStyles.fonts.body).toBe('Open Sans');
     });
   });
+
+  describe('copyFrontToBack', () => {
+    it('copies front elements and background to back (while on front)', () => {
+      const frontBg: CanvasBackground = { type: 'solid', color: '#ff0000' };
+      useDesignStore.getState().loadFullDesign({
+        id: 'copy-1',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        frontBackground: frontBg,
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().copyFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.backLayers).toHaveLength(1);
+      expect(state.backLayers[0].content).toBe('Hello');
+      expect(state.backLayers[0].id).not.toBe(sampleElement.id); // new IDs
+      expect(state.backBackground.color).toBe('#ff0000');
+      expect(state.isDirty).toBe(true);
+    });
+
+    it('copies front elements to back (while on back side)', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'copy-2',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      // Switch to back
+      useDesignStore.getState().setCurrentSide('back');
+      expect(useDesignStore.getState().elements).toHaveLength(0);
+
+      useDesignStore.getState().copyFrontToBack();
+      const state = useDesignStore.getState();
+      // Elements should now be visible since we're on the back side
+      expect(state.elements).toHaveLength(1);
+      expect(state.elements[0].content).toBe('Hello');
+      expect(state.elements[0].id).not.toBe(sampleElement.id);
+    });
+  });
+
+  describe('mirrorFrontToBack', () => {
+    it('mirrors front elements to back with flipped x positions', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'mirror-1',
+        frontLayers: [sampleElement], // x=100, width=200, canvasWidth=1050
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().mirrorFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.backLayers).toHaveLength(1);
+      // Mirrored x = canvasWidth - x - width = 1050 - 100 - 200 = 750
+      expect(state.backLayers[0].x).toBe(750);
+      expect(state.backLayers[0].y).toBe(100); // y unchanged
+      expect(state.backLayers[0].content).toBe('Hello');
+      expect(state.backLayers[0].id).not.toBe(sampleElement.id);
+    });
+
+    it('mirrors front elements while on back side updates current elements', () => {
+      useDesignStore.getState().loadFullDesign({
+        id: 'mirror-2',
+        frontLayers: [sampleElement],
+        backLayers: [],
+        isDoubleSided: true,
+        width: 1050,
+        height: 600,
+      });
+
+      useDesignStore.getState().setCurrentSide('back');
+      useDesignStore.getState().mirrorFrontToBack();
+      const state = useDesignStore.getState();
+      expect(state.elements).toHaveLength(1);
+      expect(state.elements[0].x).toBe(750);
+    });
+  });
 });
