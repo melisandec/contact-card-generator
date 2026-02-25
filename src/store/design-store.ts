@@ -115,6 +115,9 @@ interface DesignState {
   applyGlobalColorToElement: (elementId: string, colorId: string, target: 'color' | 'fill') => void;
   applyGlobalFontToElement: (elementId: string, fontRef: 'heading' | 'body') => void;
   unlinkElementStyle: (elementId: string) => void;
+
+  // History slider
+  jumpToHistory: (index: number) => void;
 }
 
 export function resolveElementStyles(element: DesignElement, globalStyles: GlobalStyles): DesignElement {
@@ -808,5 +811,17 @@ export const useDesignStore = create<DesignState>()((set) => ({
         ),
         isDirty: true,
       })),
+
+    jumpToHistory: (index) =>
+      set((state) => {
+        if (index < 0 || index >= state.history.length) return {};
+        const entry = state.history[index];
+        return {
+          elements: JSON.parse(JSON.stringify(entry.elements)),
+          background: JSON.parse(JSON.stringify(entry.background)),
+          historyIndex: index,
+          isDirty: true,
+        };
+      }),
   }));
 

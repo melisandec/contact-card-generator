@@ -207,6 +207,21 @@ export function PropertiesPanel() {
                 isOpen={colorPickerTarget === 'color'}
                 onToggle={() => setColorPickerTarget(colorPickerTarget === 'color' ? null : 'color')}
               />
+
+              {/* Smart text resizing */}
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="autoShrink"
+                  checked={selected.autoShrink ?? false}
+                  onChange={(e) => update({ autoShrink: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <label htmlFor="autoShrink" className="text-xs text-slate-600">
+                  Auto-shrink text to fit
+                  <span className="block text-[10px] text-slate-400">Reduces font size when text overflows</span>
+                </label>
+              </div>
             </div>
           </Section>
         )}

@@ -6,6 +6,7 @@ import { useDesignStore, resolveElementStyles } from '@/store/design-store';
 import { DesignElement, CanvasBackground } from '@/types';
 import { cn } from '@/lib/utils';
 import { AlignmentToolbar } from './AlignmentToolbar';
+import { getAutoShrinkFontSize, isTextOverflowing } from '@/lib/textResizing';
 
 interface CanvasElementProps {
   element: DesignElement;
@@ -95,29 +96,45 @@ function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, o
 
   const renderContent = () => {
     switch (element.type) {
-      case 'text':
+      case 'text': {
+        const effectiveFontSize = element.autoShrink
+          ? getAutoShrinkFontSize(element)
+          : (element.fontSize ?? 16);
+        const showOverflow = !element.autoShrink && isTextOverflowing(element);
+
         return (
-          <div
-            style={{
-              fontFamily: element.fontFamily ?? 'Inter',
-              fontSize: element.fontSize ?? 16,
-              fontWeight: element.fontWeight ?? '400',
-              fontStyle: element.fontStyle ?? 'normal',
-              textDecoration: element.textDecoration ?? 'none',
-              textAlign: element.textAlign ?? 'left',
-              color: element.color ?? '#000000',
-              lineHeight: element.lineHeight ?? 1.4,
-              letterSpacing: element.letterSpacing ? `${element.letterSpacing}px` : 'normal',
-              width: '100%',
-              height: '100%',
-              overflow: 'hidden',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            {element.content ?? 'Text'}
-          </div>
+          <>
+            <div
+              style={{
+                fontFamily: element.fontFamily ?? 'Inter',
+                fontSize: effectiveFontSize,
+                fontWeight: element.fontWeight ?? '400',
+                fontStyle: element.fontStyle ?? 'normal',
+                textDecoration: element.textDecoration ?? 'none',
+                textAlign: element.textAlign ?? 'left',
+                color: element.color ?? '#000000',
+                lineHeight: element.lineHeight ?? 1.4,
+                letterSpacing: element.letterSpacing ? `${element.letterSpacing}px` : 'normal',
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
+              {element.content ?? 'Text'}
+            </div>
+            {showOverflow && (
+              <div
+                className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
+                title="Text overflows – adjust font size or enable auto-shrink"
+              >
+                !
+              </div>
+            )}
+          </>
         );
+      }
 
       case 'image':
         return element.src ? (

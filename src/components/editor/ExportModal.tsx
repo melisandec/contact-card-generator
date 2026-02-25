@@ -38,6 +38,11 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
   const [includeBackSide, setIncludeBackSide] = useState(true);
   const [emailSigCopied, setEmailSigCopied] = useState(false);
 
+  // Print bleed & crop marks
+  const [addBleed, setAddBleed] = useState(false);
+  const [bleedMm, setBleedMm] = useState(3);
+  const [addCropMarks, setAddCropMarks] = useState(false);
+
   // Email signature data (editable)
   const [emailSigData, setEmailSigData] = useState<EmailSignatureData>(() =>
     extractContactFromElements(elements)
@@ -284,6 +289,56 @@ export function ExportModal({ canvasRef }: ExportModalProps) {
         {format === 'print-pdf' && (
           <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-xs text-indigo-700">
             Both front and back will be placed on a single PDF page, ready for double‑sided printing.
+          </div>
+        )}
+
+        {/* Print bleed & crop marks — for PDF and print-pdf */}
+        {(format === 'pdf' || format === 'print-pdf') && (
+          <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Print Options</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="addBleed"
+                checked={addBleed}
+                onChange={(e) => setAddBleed(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label htmlFor="addBleed" className="text-sm text-slate-700">
+                Add bleed area
+              </label>
+              {addBleed && (
+                <div className="flex items-center gap-1 ml-auto">
+                  <input
+                    type="number"
+                    value={bleedMm}
+                    onChange={(e) => setBleedMm(Math.max(1, Math.min(10, parseInt(e.target.value) || 3)))}
+                    className="w-14 px-2 py-1 text-xs border border-slate-200 rounded"
+                    min={1}
+                    max={10}
+                  />
+                  <span className="text-xs text-slate-400">mm</span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="addCropMarks"
+                checked={addCropMarks}
+                onChange={(e) => setAddCropMarks(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label htmlFor="addCropMarks" className="text-sm text-slate-700">
+                Add crop marks
+              </label>
+            </div>
+            {(addBleed || addCropMarks) && (
+              <p className="text-[10px] text-slate-400">
+                {addBleed ? `${bleedMm}mm bleed extends the canvas area.` : ''}
+                {addCropMarks ? ' Crop marks indicate trim lines.' : ''}
+              </p>
+            )}
           </div>
         )}
 

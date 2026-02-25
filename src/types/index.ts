@@ -100,6 +100,9 @@ export interface DesignElement {
   // Text on path
   pathRef?: string;
   pathOffset?: number;
+
+  // Smart text resizing
+  autoShrink?: boolean;
 }
 
 export interface CanvasBackground {

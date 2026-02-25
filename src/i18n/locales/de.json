@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Speichern",
+    "export": "Exportieren",
+    "cancel": "Abbrechen",
+    "apply": "Anwenden",
+    "delete": "Löschen",
+    "duplicate": "Duplizieren",
+    "undo": "Rückgängig",
+    "redo": "Wiederherstellen",
+    "clear": "Leinwand leeren",
+    "import": "Importieren",
+    "embed": "Einbetten",
+    "copy": "Kopieren",
+    "close": "Schließen",
+    "search": "Suchen",
+    "loading": "Wird geladen...",
+    "back": "Zurück"
+  },
+  "toolbar": {
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "hideGuides": "Lineale und Hilfslinien ausblenden",
+    "showGuides": "Lineale und Hilfslinien anzeigen",
+    "lockGuides": "Hilfslinien sperren",
+    "unlockGuides": "Hilfslinien entsperren",
+    "front": "Vorderseite",
+    "backSide": "Rückseite",
+    "flipSide": "Seite umdrehen",
+    "clearConfirm": "Alle Elemente löschen? Dies kann nicht rückgängig gemacht werden.",
+    "copyFrontToBack": "Vorderseite auf Rückseite kopieren",
+    "mirrorFrontOnBack": "Vorderseite auf Rückseite spiegeln",
+    "copyStyles": "Stile auf andere Seite kopieren",
+    "showSplitView": "Geteilte Ansicht anzeigen",
+    "hideSplitView": "Geteilte Ansicht ausblenden"
+  },
+  "sidebar": {
+    "templates": "Vorlagen",
+    "elements": "Elemente",
+    "uploads": "Uploads",
+    "text": "Text",
+    "background": "HG",
+    "layers": "Ebenen"
+  },
+  "properties": {
+    "title": "Eigenschaften",
+    "globalStyles": "Globale Stile",
+    "noElement": "Kein Element ausgewählt",
+    "noElementHint": "Klicken Sie auf ein Element auf der Leinwand, um seine Eigenschaften zu bearbeiten",
+    "positionSize": "Position und Größe",
+    "textSection": "Text",
+    "content": "Inhalt",
+    "fontFamily": "Schriftfamilie",
+    "fontSize": "Schriftgröße",
+    "textColor": "Textfarbe",
+    "autoShrink": "Text automatisch verkleinern",
+    "autoShrinkHint": "Reduziert die Schriftgröße bei Textüberlauf",
+    "shadow": "Schatten",
+    "styleFromTheme": "Stil vom Thema",
+    "headingFont": "Überschrift-Schrift",
+    "bodyFont": "Text-Schrift",
+    "unlinkTheme": "Vom Thema trennen",
+    "applyThemeColor": "Eine Themenfarbe auf dieses Element anwenden:"
+  },
+  "export": {
+    "title": "Design Exportieren",
+    "description": "Wählen Sie Ihr Exportformat und die Einstellungen",
+    "format": "Format",
+    "resolution": "Auflösung",
+    "resolutionHint": "Höhere Auflösung für Druckqualität",
+    "includeBack": "Rückseite einbeziehen",
+    "printInfo": "Vorder- und Rückseite werden auf einer einzigen PDF-Seite platziert, bereit für doppelseitigen Druck.",
+    "printOptions": "Druckoptionen",
+    "addBleed": "Beschnitt hinzufügen",
+    "addCropMarks": "Schnittmarken hinzufügen",
+    "emailSigInfo": "Bearbeiten Sie die Felder unten und kopieren Sie die HTML-Signatur für Gmail, Outlook oder Apple Mail.",
+    "copySignature": "HTML-Signatur kopieren",
+    "copied": "Kopiert!",
+    "exporting": "Wird exportiert..."
+  },
+  "score": {
+    "designScore": "Design-Bewertung",
+    "excellent": "Ausgezeichnetes Design! Ihre Karte folgt den Best Practices.",
+    "good": "Gutes Design mit Verbesserungsmöglichkeiten.",
+    "fair": "Akzeptables Design. Überprüfen Sie die Vorschläge unten.",
+    "needsWork": "Verbesserungsbedarf."
+  },
+  "autoSave": {
+    "draftFound": "Nicht gespeicherter Entwurf gefunden. Wiederherstellen?",
+    "restore": "Wiederherstellen",
+    "dismiss": "Verwerfen",
+    "draftSaved": "Entwurf gespeichert"
+  },
+  "embed": {
+    "title": "Karte Einbetten",
+    "description": "HTML generieren, um Ihre Visitenkarte auf jeder Website einzubetten",
+    "staticImage": "Statisches Bild",
+    "interactive": "Interaktives HTML",
+    "copyEmbed": "Einbettungscode kopieren"
+  },
+  "qrGenerator": {
+    "title": "QR-Kontakt-Generator",
+    "contactDetails": "Kontaktdaten",
+    "generate": "QR-Code generieren",
+    "downloadPng": "PNG herunterladen",
+    "downloadVCard": "vCard herunterladen"
+  }
+}

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface ToolbarProps {
   splitView?: boolean;
@@ -240,6 +241,9 @@ export function Toolbar({ splitView, onToggleSplitView, children }: ToolbarProps
       )}
 
       <div className="h-5 w-px bg-slate-200" />
+
+      {/* Language switcher */}
+      <LanguageSwitcher />
 
       {/* Save */}
       <Button

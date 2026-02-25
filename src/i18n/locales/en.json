@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Save",
+    "export": "Export",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "undo": "Undo",
+    "redo": "Redo",
+    "clear": "Clear canvas",
+    "import": "Import",
+    "embed": "Embed",
+    "copy": "Copy",
+    "close": "Close",
+    "search": "Search",
+    "loading": "Loading...",
+    "back": "Back"
+  },
+  "toolbar": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "hideGuides": "Hide rulers & guides",
+    "showGuides": "Show rulers & guides",
+    "lockGuides": "Lock guides",
+    "unlockGuides": "Unlock guides",
+    "front": "Front",
+    "backSide": "Back",
+    "flipSide": "Flip side",
+    "clearConfirm": "Clear all elements? This cannot be undone.",
+    "copyFrontToBack": "Copy front to back",
+    "mirrorFrontOnBack": "Mirror front on back",
+    "copyStyles": "Copy styles to other side",
+    "showSplitView": "Show split view",
+    "hideSplitView": "Hide split view"
+  },
+  "sidebar": {
+    "templates": "Templates",
+    "elements": "Elements",
+    "uploads": "Uploads",
+    "text": "Text",
+    "background": "BG",
+    "layers": "Layers"
+  },
+  "properties": {
+    "title": "Properties",
+    "globalStyles": "Global Styles",
+    "noElement": "No element selected",
+    "noElementHint": "Click an element on the canvas to edit its properties",
+    "positionSize": "Position & Size",
+    "textSection": "Text",
+    "content": "Content",
+    "fontFamily": "Font Family",
+    "fontSize": "Font Size",
+    "textColor": "Text Color",
+    "autoShrink": "Auto-shrink text to fit",
+    "autoShrinkHint": "Reduces font size when text overflows",
+    "shadow": "Shadow",
+    "styleFromTheme": "Style from Theme",
+    "headingFont": "Heading font",
+    "bodyFont": "Body font",
+    "unlinkTheme": "Unlink from theme",
+    "applyThemeColor": "Apply a theme color to this element:"
+  },
+  "export": {
+    "title": "Export Design",
+    "description": "Choose your export format and settings",
+    "format": "Format",
+    "resolution": "Resolution",
+    "resolutionHint": "Higher resolution for print quality",
+    "includeBack": "Include back side",
+    "printInfo": "Both front and back will be placed on a single PDF page, ready for double‑sided printing.",
+    "printOptions": "Print Options",
+    "addBleed": "Add bleed area",
+    "addCropMarks": "Add crop marks",
+    "emailSigInfo": "Edit the fields below and copy the HTML signature for Gmail, Outlook, or Apple Mail.",
+    "copySignature": "Copy HTML Signature",
+    "copied": "Copied!",
+    "exporting": "Exporting..."
+  },
+  "score": {
+    "designScore": "Design Score",
+    "excellent": "Excellent design! Your card follows best practices.",
+    "good": "Good design with areas to improve.",
+    "fair": "Fair design. Review suggestions below.",
+    "needsWork": "Needs improvement."
+  },
+  "autoSave": {
+    "draftFound": "Unsaved draft found. Restore?",
+    "restore": "Restore",
+    "dismiss": "Dismiss",
+    "draftSaved": "Draft saved"
+  },
+  "embed": {
+    "title": "Embed Card",
+    "description": "Generate HTML to embed your contact card on any website",
+    "staticImage": "Static Image",
+    "interactive": "Interactive HTML",
+    "copyEmbed": "Copy Embed Code"
+  },
+  "qrGenerator": {
+    "title": "QR Contact Generator",
+    "contactDetails": "Contact Details",
+    "generate": "Generate QR Code",
+    "downloadPng": "Download PNG",
+    "downloadVCard": "Download vCard"
+  }
+}
