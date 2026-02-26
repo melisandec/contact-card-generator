@@ -128,6 +128,7 @@ function CanvasElement({ element, isSelected, isMultiSelected, isEditing, zoom, 
           return (
             <textarea
               ref={editInputRef}
+              aria-label="Edit text content"
               value={element.content ?? ''}
               onChange={(e) => onUpdate(element.id, { content: e.target.value })}
               onBlur={() => onExitEditing()}

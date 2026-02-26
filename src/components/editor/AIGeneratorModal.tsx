@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDesignStore } from '@/store/design-store';
 import { generateDesignVariations, AIDesignVariation, AIDesignPrompt } from '@/lib/aiDesignGenerator';
 import { X, Loader2, RefreshCw, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 
 interface AIGeneratorModalProps {
   isOpen: boolean;
@@ -31,7 +31,7 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
     setLoading(true);
     setSelectedIdx(null);
 
-    // Simulate async processing
+    // Simulate async processing — placeholder for future AI API integration
     setTimeout(() => {
       const input: AIDesignPrompt = { prompt, includeElements };
       const results = generateDesignVariations(input, canvasWidth, canvasHeight);
@@ -45,7 +45,7 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
     const v = variations[selectedIdx];
     const elements = v.elements.map((el, i) => ({
       ...el,
-      id: `ai-${Date.now()}-${i}`,
+      id: generateId(),
       zIndex: i,
     }));
     loadDesign(elements, v.background, canvasWidth, canvasHeight);
