@@ -12,6 +12,7 @@ import { SaveModal } from "@/components/editor/SaveModal";
 import { ImportContactModal } from "@/components/editor/ImportContactModal";
 import { CRMPanel } from "@/components/editor/CRMPanel";
 import { EmbedModal } from "@/components/editor/EmbedModal";
+import { AIGeneratorModal } from "@/components/editor/AIGeneratorModal";
 import { DesignScorePanel } from "@/components/editor/DesignScorePanel";
 import { HistorySlider } from "@/components/editor/HistorySlider";
 import { DimensionsPreset } from "@/components/editor/DimensionsPreset";
@@ -31,6 +32,7 @@ function EditorContent() {
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [crmPanelOpen, setCrmPanelOpen] = useState(false);
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
+  const [aiGeneratorOpen, setAiGeneratorOpen] = useState(false);
   const { lastSaved, draftAvailable, restoreDraft, dismissDraft } = useAutoSave();
   const {
     zoom,
@@ -132,6 +134,7 @@ function EditorContent() {
       <Toolbar
         splitView={splitView}
         onToggleSplitView={() => setSplitView((v) => !v)}
+        onOpenAIGenerator={() => setAiGeneratorOpen(true)}
       >
         {/* Integration buttons in toolbar */}
         <button
@@ -238,6 +241,7 @@ function EditorContent() {
       <ImportContactModal open={importModalOpen} onOpenChange={setImportModalOpen} />
       <CRMPanel open={crmPanelOpen} onOpenChange={setCrmPanelOpen} />
       <EmbedModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} />
+      <AIGeneratorModal isOpen={aiGeneratorOpen} onClose={() => setAiGeneratorOpen(false)} />
 
       {/* Auto-save draft restore banner */}
       {draftAvailable && (
