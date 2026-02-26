@@ -25,6 +25,7 @@ interface DesignState {
   elements: DesignElement[];
   selectedElementId: string | null;
   selectedElementIds: string[];
+  editingElementId: string | null;
   background: CanvasBackground;
   zoom: number;
   canvasWidth: number;
@@ -55,6 +56,7 @@ interface DesignState {
   removeElement: (id: string) => void;
   updateElement: (id: string, updates: Partial<DesignElement>) => void;
   selectElement: (id: string | null) => void;
+  setEditingElementId: (id: string | null) => void;
   toggleSelectElement: (id: string) => void;
   selectMultipleElements: (ids: string[]) => void;
   setZoom: (zoom: number) => void;
@@ -153,6 +155,7 @@ export const useDesignStore = create<DesignState>()((set) => ({
     elements: [],
     selectedElementId: null,
     selectedElementIds: [],
+    editingElementId: null,
     background: defaultBackground,
     zoom: 1,
     canvasWidth: 1050,
@@ -224,7 +227,9 @@ export const useDesignStore = create<DesignState>()((set) => ({
         isDirty: true,
       })),
 
-    selectElement: (id) => set({ selectedElementId: id, selectedElementIds: id ? [id] : [] }),
+    selectElement: (id) => set({ selectedElementId: id, selectedElementIds: id ? [id] : [], editingElementId: null }),
+
+    setEditingElementId: (id) => set({ editingElementId: id }),
 
     toggleSelectElement: (id) =>
       set((state) => {

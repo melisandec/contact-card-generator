@@ -41,7 +41,10 @@ import {
   Loader2,
   LogIn,
   AlertCircle,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from "lucide-react";
+import { cardToProfile, profileToCard, type ProfileData } from "@/lib/fieldSync";
 
 const SOCIAL_PLATFORMS = [
   { id: "linkedin", label: "LinkedIn", icon: Linkedin },
@@ -72,7 +75,7 @@ const FONTS = [
 export function DigitalProfilePanel() {
   const { data: session, status: authStatus } = useSession();
   const { profiles, mutate } = useProfiles();
-  const { addElement, currentDesignId } = useDesignStore();
+  const { addElement, currentDesignId, elements, setElements } = useDesignStore();
 
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
     null,
@@ -218,6 +221,34 @@ export function DigitalProfilePanel() {
       src: qrData.dataUrl,
       objectFit: "contain",
     });
+  };
+
+  const handleFillProfileFromCard = () => {
+    const extracted = cardToProfile(elements);
+    setForm((prev) => ({
+      ...prev,
+      fullName: extracted.fullName ?? prev.fullName,
+      title: extracted.title ?? prev.title,
+      company: extracted.company ?? prev.company,
+      email: extracted.email ?? prev.email,
+      phone: extracted.phone ?? prev.phone,
+      website: extracted.website ?? prev.website,
+      bio: extracted.bio ?? prev.bio,
+    }));
+  };
+
+  const handleUpdateCardFromProfile = () => {
+    const profileData: ProfileData = {
+      fullName: form.fullName,
+      title: form.title,
+      company: form.company,
+      email: form.email,
+      phone: form.phone,
+      website: form.website,
+      bio: form.bio,
+    };
+    const updated = profileToCard(elements, profileData);
+    setElements(updated);
   };
 
   const addSocialLink = () => {
@@ -662,6 +693,29 @@ export function DigitalProfilePanel() {
               ))}
             </select>
           </div>
+        </div>
+      )}
+
+      {/* Sync Buttons */}
+      {(isCreating || selectedProfileId) && (
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            Card ↔ Profile Sync
+          </p>
+          <button
+            onClick={handleFillProfileFromCard}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            <ArrowDownToLine className="w-3.5 h-3.5" />
+            Fill profile from card
+          </button>
+          <button
+            onClick={handleUpdateCardFromProfile}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            <ArrowUpFromLine className="w-3.5 h-3.5" />
+            Update card from profile
+          </button>
         </div>
       )}
 
