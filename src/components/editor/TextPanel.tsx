@@ -2,15 +2,13 @@
 
 import { useDesignStore } from '@/store/design-store';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Type, Bold, Italic, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Type, Tag } from 'lucide-react';
+import { FIELD_TYPE_OPTIONS } from '@/lib/fieldSync';
 
 const fontFamilies = [
   'Inter', 'Arial', 'Georgia', 'Times New Roman', 'Helvetica',
   'Verdana', 'Trebuchet MS', 'Courier New', 'monospace', 'cursive',
 ];
-
-const fontSizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96];
 
 export function TextPanel() {
   const { addElement } = useDesignStore();
@@ -67,6 +65,30 @@ export function TextPanel() {
           >
             <span className="text-xs text-slate-400">Caption</span>
           </button>
+        </div>
+      </div>
+
+      {/* Labeled fields */}
+      <div>
+        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Add Field</h4>
+        <div className="grid grid-cols-2 gap-1.5">
+          {FIELD_TYPE_OPTIONS.filter((f) => f.value !== 'custom').map((field) => (
+            <button
+              key={field.value}
+              onClick={() =>
+                addText({
+                  content: field.label,
+                  fontSize: field.value === 'name' ? 28 : 14,
+                  fontWeight: field.value === 'name' ? '700' : '400',
+                  fieldType: field.value,
+                })
+              }
+              className="flex items-center gap-1.5 px-2 py-2 text-xs text-slate-600 border border-slate-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+            >
+              <Tag className="w-3 h-3 text-indigo-400" />
+              {field.label}
+            </button>
+          ))}
         </div>
       </div>
 

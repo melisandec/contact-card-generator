@@ -23,6 +23,7 @@ import {
   Unlink2,
 } from 'lucide-react';
 import type { DesignElement } from '@/types';
+import { FIELD_TYPE_OPTIONS } from '@/lib/fieldSync';
 
 export function PropertiesPanel() {
   const {
@@ -144,6 +145,24 @@ export function PropertiesPanel() {
                   className="w-full border border-slate-200 rounded-lg p-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 resize-none"
                   rows={3}
                 />
+              </div>
+
+              {/* Field Type */}
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Field Type</label>
+                <select
+                  value={selected.fieldType ?? ''}
+                  onChange={(e) => update({ fieldType: (e.target.value || undefined) as DesignElement['fieldType'] })}
+                  className="w-full h-9 border border-slate-200 rounded-lg px-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  <option value="">None</option>
+                  {FIELD_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Label this field to enable card ↔ profile sync
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2">

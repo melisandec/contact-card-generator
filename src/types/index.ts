@@ -103,6 +103,9 @@ export interface DesignElement {
 
   // Smart text resizing
   autoShrink?: boolean;
+
+  // Labeled field type for card-profile sync
+  fieldType?: 'name' | 'title' | 'company' | 'email' | 'phone' | 'website' | 'location' | 'description' | 'custom';
 }
 
 export interface CanvasBackground {

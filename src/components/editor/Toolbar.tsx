@@ -18,6 +18,7 @@ import {
   Columns2,
   Ruler,
   Lock,
+  Sparkles,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
@@ -26,10 +27,11 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 interface ToolbarProps {
   splitView?: boolean;
   onToggleSplitView?: () => void;
+  onOpenAIGenerator?: () => void;
   children?: React.ReactNode;
 }
 
-export function Toolbar({ splitView, onToggleSplitView, children }: ToolbarProps) {
+export function Toolbar({ splitView, onToggleSplitView, onOpenAIGenerator, children }: ToolbarProps) {
   const {
     zoom, setZoom, undo, redo, clearCanvas, historyIndex, history,
     currentSide, setCurrentSide, isDoubleSided,
@@ -121,6 +123,19 @@ export function Toolbar({ splitView, onToggleSplitView, children }: ToolbarProps
           </>
         )}
       </div>
+
+      {/* AI Generate */}
+      <div className="h-5 w-px bg-slate-200" />
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onOpenAIGenerator}
+        title="AI Design Generator"
+        className="text-indigo-600 hover:bg-indigo-50"
+      >
+        <Sparkles className="w-4 h-4 mr-1" />
+        <span className="text-xs">✨ AI Generate</span>
+      </Button>
 
       {/* Side Switcher — visible when double-sided */}
       {isDoubleSided && (

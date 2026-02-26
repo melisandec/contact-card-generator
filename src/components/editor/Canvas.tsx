@@ -12,17 +12,22 @@ interface CanvasElementProps {
   element: DesignElement;
   isSelected: boolean;
   isMultiSelected: boolean;
+  isEditing: boolean;
   zoom: number;
   onSelect: (id: string, additive?: boolean) => void;
   onUpdate: (id: string, updates: Partial<DesignElement>) => void;
+  onDoubleClick: (id: string) => void;
+  onExitEditing: () => void;
 }
 
-function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, onUpdate }: CanvasElementProps) {
+function CanvasElement({ element, isSelected, isMultiSelected, isEditing, zoom, onSelect, onUpdate, onDoubleClick, onExitEditing }: CanvasElementProps) {
   const dragStartRef = useRef<{ x: number; y: number; elX: number; elY: number } | null>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (element.locked) return;
+      if (isEditing) return; // Don't start drag while editing
       e.stopPropagation();
       onSelect(element.id, e.shiftKey);
 
@@ -52,8 +57,25 @@ function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, o
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     },
-    [element, zoom, onSelect, onUpdate]
+    [element, zoom, onSelect, onUpdate, isEditing]
   );
+
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (element.locked || element.type !== 'text') return;
+      e.stopPropagation();
+      onDoubleClick(element.id);
+    },
+    [element, onDoubleClick]
+  );
+
+  // Focus the textarea when entering edit mode
+  useEffect(() => {
+    if (isEditing && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [isEditing]);
 
   const getBackgroundStyle = (): React.CSSProperties => {
     if (element.type === 'shape') {
@@ -101,6 +123,48 @@ function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, o
           ? getAutoShrinkFontSize(element)
           : (element.fontSize ?? 16);
         const showOverflow = !element.autoShrink && isTextOverflowing(element);
+
+        if (isEditing) {
+          return (
+            <textarea
+              ref={editInputRef}
+              aria-label="Edit text content"
+              value={element.content ?? ''}
+              onChange={(e) => onUpdate(element.id, { content: e.target.value })}
+              onBlur={() => onExitEditing()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  onExitEditing();
+                }
+                e.stopPropagation();
+              }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                fontFamily: element.fontFamily ?? 'Inter',
+                fontSize: effectiveFontSize,
+                fontWeight: element.fontWeight ?? '400',
+                fontStyle: element.fontStyle ?? 'normal',
+                textDecoration: element.textDecoration ?? 'none',
+                textAlign: element.textAlign ?? 'left',
+                color: element.color ?? '#000000',
+                lineHeight: element.lineHeight ?? 1.4,
+                letterSpacing: element.letterSpacing ? `${element.letterSpacing}px` : 'normal',
+                width: '100%',
+                height: '100%',
+                resize: 'none',
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                padding: 0,
+                margin: 0,
+                overflow: 'hidden',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            />
+          );
+        }
 
         return (
           <>
@@ -210,8 +274,10 @@ function CanvasElement({ element, isSelected, isMultiSelected, zoom, onSelect, o
     <div
       style={elementStyle}
       onMouseDown={handleMouseDown}
+      onDoubleClick={handleDoubleClick}
       className={cn(
-        isSelected && 'ring-2 ring-indigo-500 ring-offset-1',
+        isSelected && !isEditing && 'ring-2 ring-indigo-500 ring-offset-1',
+        isEditing && 'ring-2 ring-dashed ring-indigo-400 ring-offset-1',
         isMultiSelected && !isSelected && 'ring-2 ring-blue-400 ring-offset-1'
       )}
     >
@@ -355,8 +421,8 @@ interface CanvasProps {
 
 export function Canvas({ exportRef, splitView }: CanvasProps) {
   const {
-    elements, selectedElementId, selectedElementIds, background, zoom, canvasWidth, canvasHeight,
-    selectElement, toggleSelectElement, updateElement, currentSide, isDoubleSided, globalStyles,
+    elements, selectedElementId, selectedElementIds, editingElementId, background, zoom, canvasWidth, canvasHeight,
+    selectElement, toggleSelectElement, updateElement, setEditingElementId, currentSide, isDoubleSided, globalStyles,
     frontLayers, backLayers, frontBackground, backBackground, setCurrentSide,
   } = useDesignStore();
 
@@ -391,6 +457,17 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
     },
     [selectElement, toggleSelectElement]
   );
+
+  const handleElementDoubleClick = useCallback(
+    (id: string) => {
+      setEditingElementId(id);
+    },
+    [setEditingElementId]
+  );
+
+  const handleExitEditing = useCallback(() => {
+    setEditingElementId(null);
+  }, [setEditingElementId]);
 
   return (
     <div className="flex-1 canvas-workspace flex items-center justify-center overflow-auto p-8">
@@ -438,7 +515,7 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
               ref={exportRef}
               style={canvasStyle}
               className="shadow-2xl"
-              onClick={() => selectElement(null)}
+              onClick={() => { selectElement(null); setEditingElementId(null); }}
             >
               {elements.map((element) => (
                 <CanvasElement
@@ -446,9 +523,12 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
                   element={resolveElementStyles(element, globalStyles)}
                   isSelected={selectedElementId === element.id}
                   isMultiSelected={selectedElementIds.includes(element.id)}
+                  isEditing={editingElementId === element.id}
                   zoom={zoom}
                   onSelect={handleElementSelect}
                   onUpdate={updateElement}
+                  onDoubleClick={handleElementDoubleClick}
+                  onExitEditing={handleExitEditing}
                 />
               ))}
 
