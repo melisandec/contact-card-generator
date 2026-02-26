@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useDesignStore } from '@/store/design-store';
-import { generateDesignVariations, AIDesignVariation, AIDesignPrompt } from '@/lib/aiDesignGenerator';
-import { X, Loader2, RefreshCw, Sparkles } from 'lucide-react';
-import { cn, generateId } from '@/lib/utils';
+import { useState } from "react";
+import { useDesignStore } from "@/store/design-store";
+import {
+  generateAIDesignVariations,
+  generateDesignVariations,
+  AIDesignVariation,
+  AIDesignPrompt,
+  AIGenerateResult,
+} from "@/lib/aiDesignGenerator";
+import { X, Loader2, RefreshCw, Sparkles, AlertTriangle } from "lucide-react";
+import { cn, generateId } from "@/lib/utils";
 
 interface AIGeneratorModalProps {
   isOpen: boolean;
@@ -14,7 +20,7 @@ interface AIGeneratorModalProps {
 export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
   const { canvasWidth, canvasHeight, loadDesign } = useDesignStore();
 
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [includeElements, setIncludeElements] = useState({
     name: true,
     title: true,
@@ -25,19 +31,74 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
   const [variations, setVariations] = useState<AIDesignVariation[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [source, setSource] = useState<"ai" | "fallback" | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!prompt.trim()) return;
     setLoading(true);
     setSelectedIdx(null);
+    setErrorMessage(null);
+    setSource(null);
 
-    // Simulate async processing — placeholder for future AI API integration
-    setTimeout(() => {
+    try {
       const input: AIDesignPrompt = { prompt, includeElements };
-      const results = generateDesignVariations(input, canvasWidth, canvasHeight);
-      setVariations(results);
+      const result: AIGenerateResult = await generateAIDesignVariations(
+        input,
+        canvasWidth,
+        canvasHeight,
+      );
+      setVariations(result.variations);
+      setSource(result.source);
+
+      if (result.source === "fallback" && result.errors?.length) {
+        const detail = result.errors[0] ?? "";
+        const isKeyMissing = detail
+          .toLowerCase()
+          .includes("huggingface_api_key");
+        setErrorMessage(
+          isKeyMissing
+            ? "Hugging Face API key not configured. Add your free API token to .env.local (HUGGINGFACE_API_KEY). Showing template suggestions instead."
+            : `AI service unavailable: ${detail}. Showing template-based suggestions instead.`,
+        );
+      }
+    } catch {
+      // Full fallback to sync local generation
+      const input: AIDesignPrompt = { prompt, includeElements };
+      const fallback = generateDesignVariations(
+        input,
+        canvasWidth,
+        canvasHeight,
+      );
+      setVariations(fallback);
+      setSource("fallback");
+      setErrorMessage(
+        "AI service unavailable. Showing template-based suggestions instead.",
+      );
+    } finally {
       setLoading(false);
-    }, 600);
+    }
+  };
+
+  const handleRandomTemplate = () => {
+    setLoading(true);
+    setSelectedIdx(null);
+    setErrorMessage(null);
+
+    const randomPrompts = [
+      "modern minimal business card",
+      "elegant gold luxury card",
+      "tech startup gradient card",
+      "nature organic card",
+      "bold corporate card",
+    ];
+    const randomPrompt =
+      randomPrompts[Math.floor(Math.random() * randomPrompts.length)];
+    const input: AIDesignPrompt = { prompt: randomPrompt, includeElements };
+    const fallback = generateDesignVariations(input, canvasWidth, canvasHeight);
+    setVariations(fallback);
+    setSource("fallback");
+    setLoading(false);
   };
 
   const handleApply = () => {
@@ -61,7 +122,9 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-lg font-semibold text-slate-800">AI Design Generator</h2>
+            <h2 className="text-lg font-semibold text-slate-800">
+              AI Design Generator
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -93,13 +156,16 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
             </label>
             <div className="flex flex-wrap gap-3">
               {[
-                { key: 'name' as const, label: 'Name' },
-                { key: 'title' as const, label: 'Title' },
-                { key: 'company' as const, label: 'Company' },
-                { key: 'contactInfo' as const, label: 'Contact Info' },
-                { key: 'qrCode' as const, label: 'QR Code' },
+                { key: "name" as const, label: "Name" },
+                { key: "title" as const, label: "Title" },
+                { key: "company" as const, label: "Company" },
+                { key: "contactInfo" as const, label: "Contact Info" },
+                { key: "qrCode" as const, label: "QR Code" },
               ].map(({ key, label }) => (
-                <label key={key} className="flex items-center gap-1.5 text-sm text-slate-600">
+                <label
+                  key={key}
+                  className="flex items-center gap-1.5 text-sm text-slate-600"
+                >
                   <input
                     type="checkbox"
                     checked={includeElements[key]}
@@ -126,7 +192,7 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Generating...
+                Generating with AI...
               </>
             ) : (
               <>
@@ -135,6 +201,31 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
               </>
             )}
           </button>
+
+          {/* Error / fallback banner */}
+          {errorMessage && (
+            <div className="flex items-start gap-2 p-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl">
+              <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" />
+              <div className="flex-1">
+                <p>{errorMessage}</p>
+                <button
+                  onClick={handleRandomTemplate}
+                  className="mt-1 text-xs font-medium text-amber-700 underline hover:text-amber-900"
+                >
+                  Pick a random template instead
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Source indicator */}
+          {source && variations.length > 0 && (
+            <p className="text-xs text-slate-400 text-center">
+              {source === "ai"
+                ? "Generated by AI based on your prompt"
+                : "Generated from template library"}
+            </p>
+          )}
 
           {/* Variations */}
           {variations.length > 0 && (
@@ -159,10 +250,10 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
                     key={v.id}
                     onClick={() => setSelectedIdx(idx)}
                     className={cn(
-                      'rounded-xl border-2 overflow-hidden transition-all hover:shadow-md p-1',
+                      "rounded-xl border-2 overflow-hidden transition-all hover:shadow-md p-1",
                       selectedIdx === idx
-                        ? 'border-indigo-500 shadow-md ring-2 ring-indigo-200'
-                        : 'border-slate-200 hover:border-indigo-300'
+                        ? "border-indigo-500 shadow-md ring-2 ring-indigo-200"
+                        : "border-slate-200 hover:border-indigo-300",
                     )}
                   >
                     {/* Mini preview */}
@@ -174,21 +265,25 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
                         <div
                           key={i}
                           style={{
-                            position: 'absolute',
+                            position: "absolute",
                             left: `${(el.x / canvasWidth) * 100}%`,
                             top: `${(el.y / canvasHeight) * 100}%`,
                             width: `${(el.width / canvasWidth) * 100}%`,
                             fontSize: Math.max(4, (el.fontSize ?? 12) * 0.3),
-                            fontWeight: el.fontWeight ?? '400',
-                            color: el.type === 'text' ? el.color : undefined,
-                            backgroundColor: el.type === 'shape' ? el.fill : undefined,
-                            height: el.type === 'shape' ? `${(el.height / canvasHeight) * 100}%` : undefined,
-                            textAlign: el.textAlign ?? 'left',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
+                            fontWeight: el.fontWeight ?? "400",
+                            color: el.type === "text" ? el.color : undefined,
+                            backgroundColor:
+                              el.type === "shape" ? el.fill : undefined,
+                            height:
+                              el.type === "shape"
+                                ? `${(el.height / canvasHeight) * 100}%`
+                                : undefined,
+                            textAlign: el.textAlign ?? "left",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
                           }}
                         >
-                          {el.type === 'text' ? el.content : null}
+                          {el.type === "text" ? el.content : null}
                         </div>
                       ))}
                     </div>
@@ -216,10 +311,16 @@ export function AIGeneratorModal({ isOpen, onClose }: AIGeneratorModalProps) {
   );
 }
 
-function getPreviewBgStyle(bg: AIDesignVariation['background']): React.CSSProperties {
-  if (bg.type === 'gradient' && bg.gradient) {
-    const stops = bg.gradient.stops.map((s) => `${s.color} ${s.position}%`).join(', ');
-    return { backgroundImage: `linear-gradient(${bg.gradient.angle ?? 135}deg, ${stops})` };
+function getPreviewBgStyle(
+  bg: AIDesignVariation["background"],
+): React.CSSProperties {
+  if (bg.type === "gradient" && bg.gradient) {
+    const stops = bg.gradient.stops
+      .map((s) => `${s.color} ${s.position}%`)
+      .join(", ");
+    return {
+      backgroundImage: `linear-gradient(${bg.gradient.angle ?? 135}deg, ${stops})`,
+    };
   }
-  return { backgroundColor: bg.color ?? '#ffffff' };
+  return { backgroundColor: bg.color ?? "#ffffff" };
 }
