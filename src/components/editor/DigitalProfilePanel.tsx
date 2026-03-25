@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useDesignStore } from "@/store/design-store";
 import {
@@ -21,10 +21,8 @@ import {
   Plus,
   Trash2,
   QrCode,
-  ExternalLink,
   Copy,
   Check,
-  BarChart3,
   ChevronDown,
   ChevronRight,
   Globe,

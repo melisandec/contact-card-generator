@@ -35,7 +35,7 @@ export function DesignCard({
   onMoveToFolder,
 }: DesignCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showFolderMenu, setShowFolderMenu] = useState(false);
 
   const formattedDate = new Date(design.updatedAt).toLocaleDateString("en-US", {
@@ -44,14 +44,9 @@ export function DesignCard({
     year: "numeric",
   });
 
-  const handleDelete = () => {
-    if (confirmDelete) {
-      onDelete(design.id);
-      setConfirmDelete(false);
-    } else {
-      setConfirmDelete(true);
-      setTimeout(() => setConfirmDelete(false), 3000);
-    }
+  const handleDeleteConfirm = () => {
+    onDelete(design.id);
+    setShowDeleteModal(false);
   };
 
   return (
@@ -61,10 +56,7 @@ export function DesignCard({
         isHovered && "shadow-lg border-indigo-200 scale-[1.02]",
       )}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setConfirmDelete(false);
-      }}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Thumbnail */}
       <div className="relative aspect-[7/4] bg-slate-100 overflow-hidden">
@@ -180,15 +172,46 @@ export function DesignCard({
           )}
           <Button
             size="icon-sm"
-            variant={confirmDelete ? "destructive" : "secondary"}
-            onClick={handleDelete}
-            title={confirmDelete ? "Click again to confirm" : "Delete design"}
+            variant="secondary"
+            onClick={() => setShowDeleteModal(true)}
+            title="Delete design"
             aria-label={`Delete ${design.name}`}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </Button>
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDeleteModal(false)}>
+          <div className="bg-white rounded-2xl shadow-xl p-5 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Delete &ldquo;{design.name}&rdquo;?</p>
+                <p className="text-xs text-slate-500 mt-1">This design will be permanently deleted and cannot be recovered.</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Card info */}
       <div className="p-3">

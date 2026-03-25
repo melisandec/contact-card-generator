@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { useDesignStore } from '@/store/design-store';
 import { cn } from '@/lib/utils';
-import { Eye, EyeOff, Lock, Unlock, Trash2, ChevronUp, ChevronDown, ChevronRight, Type, Square, Image, Group, Ungroup } from 'lucide-react';
+import { Eye, EyeOff, Lock, Unlock, Trash2, ChevronUp, ChevronDown, ChevronRight, Type, Square, Image as ImageIcon, Group, Ungroup } from 'lucide-react';
 import type { DesignElement } from '@/types';
 
 function getElementIcon(element: DesignElement) {
   switch (element.type) {
     case 'text': return <Type className="w-3.5 h-3.5" />;
     case 'shape': return <Square className="w-3.5 h-3.5" />;
-    case 'image': return <Image className="w-3.5 h-3.5" />;
+    case 'image': return <ImageIcon className="w-3.5 h-3.5" />;
     case 'group': return <Group className="w-3.5 h-3.5" />;
     default: return <Square className="w-3.5 h-3.5" />;
   }

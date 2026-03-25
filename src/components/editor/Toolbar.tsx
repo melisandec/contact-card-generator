@@ -19,6 +19,7 @@ import {
   Ruler,
   Lock,
   Sparkles,
+  CreditCard,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
@@ -34,7 +35,7 @@ interface ToolbarProps {
 export function Toolbar({ splitView, onToggleSplitView, onOpenAIGenerator, children }: ToolbarProps) {
   const {
     zoom, setZoom, undo, redo, clearCanvas, historyIndex, history,
-    currentSide, setCurrentSide, isDoubleSided,
+    currentSide, setCurrentSide, isDoubleSided, setIsDoubleSided,
     copyStylesToSide, copyFrontToBack, mirrorFrontToBack,
     guidesVisible, setGuidesVisible, guidesLocked, setGuidesLocked,
   } = useDesignStore();
@@ -123,6 +124,19 @@ export function Toolbar({ splitView, onToggleSplitView, onOpenAIGenerator, child
           </>
         )}
       </div>
+
+      {/* Double-sided toggle */}
+      <div className="h-5 w-px bg-slate-200" />
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsDoubleSided(!isDoubleSided)}
+        title={isDoubleSided ? 'Switch to single-sided card' : 'Enable double-sided card'}
+        className={cn(isDoubleSided && 'bg-indigo-50 text-indigo-600')}
+      >
+        <CreditCard className="w-4 h-4 mr-1" />
+        <span className="text-xs hidden sm:inline">{isDoubleSided ? '2-sided' : '1-sided'}</span>
+      </Button>
 
       {/* AI Generate */}
       <div className="h-5 w-px bg-slate-200" />

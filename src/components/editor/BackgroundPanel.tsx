@@ -141,7 +141,7 @@ export function BackgroundPanel() {
 
           <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stock Photos</h4>
           <div className="grid grid-cols-2 gap-2">
-            {['abstract', 'gradient', 'texture', 'pattern', 'nature', 'city'].map((term, i) => (
+            {['abstract', 'gradient', 'texture', 'pattern', 'nature', 'city'].map((term) => (
               <button
                 key={term}
                 onClick={() => {

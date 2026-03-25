@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           designId: id,
           version: versionCount + 1,
           name: `Version ${versionCount + 1}`,
-          data: design.data,
+          data: design.data ?? {},
           frontLayers: design.frontLayers ?? undefined,
           backLayers: design.backLayers ?? undefined,
           isDoubleSided: design.isDoubleSided,

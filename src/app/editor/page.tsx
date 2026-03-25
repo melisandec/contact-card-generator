@@ -17,7 +17,7 @@ import { DesignScorePanel } from "@/components/editor/DesignScorePanel";
 import { HistorySlider } from "@/components/editor/HistorySlider";
 import { DimensionsPreset } from "@/components/editor/DimensionsPreset";
 import { useDesignStore } from "@/store/design-store";
-import { useUIStore } from "@/store/ui-store";
+
 import { useDesign } from "@/hooks/useDesign";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { cn } from "@/lib/utils";
@@ -51,7 +51,6 @@ function EditorContent() {
     groupElements,
     ungroupElements,
   } = useDesignStore();
-  const { exportModalOpen } = useUIStore();
   const searchParams = useSearchParams();
   const designId = searchParams.get("id");
   const { design, isLoading: isDesignLoading } = useDesign(designId ?? "");
@@ -256,7 +255,7 @@ function EditorContent() {
             </span>
           </div>
           <a
-            href="/auth/signin"
+            href={`/auth/signin?callbackUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '/editor')}`}
             className="shrink-0 px-3 py-1 text-xs font-semibold bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors"
           >
             Sign in to save

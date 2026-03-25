@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { QRContactGenerator } from "@/lib/qrContactGenerator";
 import QRCode from "qrcode";
 
 // GET /api/profiles/[id]/qr – generate QR code for the profile

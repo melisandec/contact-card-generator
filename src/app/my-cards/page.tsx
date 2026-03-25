@@ -41,9 +41,10 @@ export default function MyCardsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
-  // Share / Version modals
+  // Share / Version / Delete modals
   const [shareDesignId, setShareDesignId] = useState<string | null>(null);
   const [versionDesignId, setVersionDesignId] = useState<string | null>(null);
+  const [deleteDesignId, setDeleteDesignId] = useState<string | null>(null);
 
   // Export ZIP state
   const [isExporting, setIsExporting] = useState(false);
@@ -412,7 +413,7 @@ export default function MyCardsPage() {
                   <Button
                     size="icon-sm"
                     variant="ghost"
-                    onClick={() => handleDelete(design.id)}
+                    onClick={() => setDeleteDesignId(design.id)}
                     title="Delete"
                     className="text-red-400 hover:text-red-500 hover:bg-red-50"
                     aria-label={`Delete ${design.name}`}
@@ -436,6 +437,36 @@ export default function MyCardsPage() {
           designId={shareDesignId}
           designName={shareDesign.name}
         />
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteDesignId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setDeleteDesignId(null)}>
+          <div className="bg-white rounded-2xl shadow-xl p-5 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">
+                  Delete &ldquo;{filteredDesigns.find(d => d.id === deleteDesignId)?.name}&rdquo;?
+                </p>
+                <p className="text-xs text-slate-500 mt-1">This design will be permanently deleted and cannot be recovered.</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setDeleteDesignId(null)} className="flex-1 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={() => { handleDelete(deleteDesignId); setDeleteDesignId(null); }}
+                className="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Version history modal */}

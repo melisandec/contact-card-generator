@@ -17,7 +17,14 @@ import {
   Mail,
   Shield,
   Pencil,
+  Link2,
+  Check,
+  Globe,
 } from "lucide-react";
+import useSWR from "swr";
+import type { DigitalProfile } from "@/types";
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 interface ShareModalProps {
   open: boolean;
@@ -38,6 +45,21 @@ export function ShareModal({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Fetch the digital profile linked to this design (if any)
+  const { data: profiles } = useSWR<DigitalProfile[]>("/api/profiles", fetcher);
+  const linkedProfile = profiles?.find((p) => p.designId === designId && p.isPublic);
+  const publicUrl = linkedProfile
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/p/${linkedProfile.slug}`
+    : null;
+
+  const handleCopyLink = () => {
+    if (!publicUrl) return;
+    navigator.clipboard.writeText(publicUrl);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +103,26 @@ export function ShareModal({
         Share <strong className="text-slate-700">{designName}</strong> with team
         members
       </p>
+
+      {/* Public profile link */}
+      {publicUrl ? (
+        <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl mb-4">
+          <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span className="flex-1 text-xs text-emerald-800 truncate font-mono">{publicUrl}</span>
+          <button
+            onClick={handleCopyLink}
+            className="shrink-0 flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            {linkCopied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+            {linkCopied ? "Copied!" : "Copy link"}
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl mb-4 text-xs text-slate-500">
+          <Globe className="w-4 h-4 text-slate-400 shrink-0" />
+          <span>No public profile linked. Create one in the <strong>Profile</strong> tab in the editor.</span>
+        </div>
+      )}
 
       {/* Add collaborator form */}
       <form onSubmit={handleAdd} className="flex gap-2 mb-4">

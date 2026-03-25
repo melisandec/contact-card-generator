@@ -41,7 +41,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
         designId: id,
         version: latestVersion + 1,
         name: `Before restore (auto-saved)`,
-        data: design.data,
+        data: design.data ?? {},
         frontLayers: design.frontLayers ?? undefined,
         backLayers: design.backLayers ?? undefined,
         isDoubleSided: design.isDoubleSided,

@@ -532,12 +532,21 @@ export function Canvas({ exportRef, splitView }: CanvasProps) {
                 />
               ))}
 
-              {/* Empty back side prompt */}
-              {isDoubleSided && currentSide === 'back' && elements.length === 0 && (
+              {/* Empty canvas hint */}
+              {elements.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="text-center">
-                    <p className="text-sm text-slate-400">Add elements to the back of your card.</p>
-                    <p className="text-xs text-slate-300 mt-1">Use the sidebar to add text, shapes, or images.</p>
+                  <div className="text-center px-4">
+                    {isDoubleSided && currentSide === 'back' ? (
+                      <>
+                        <p className="text-sm text-slate-400">Back side is empty</p>
+                        <p className="text-xs text-slate-300 mt-1">Add elements from the sidebar.</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm font-medium text-slate-400">Start from a template or add elements</p>
+                        <p className="text-xs text-slate-300 mt-1">Use the sidebar on the left — try <span className="font-semibold">Templates</span> to get started quickly.</p>
+                      </>
+                    )}
                   </div>
                 </div>
               )}

@@ -1,4 +1,4 @@
-import { Design, DesignElement, CanvasBackground } from '@/types';
+import { DesignElement, CanvasBackground } from '@/types';
 import { generateId } from '@/lib/utils';
 
 const STORAGE_KEY = 'cardcrafter_guest_designs';

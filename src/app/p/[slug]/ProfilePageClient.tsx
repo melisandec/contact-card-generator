@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Mail,
   Phone,
@@ -180,8 +181,9 @@ export default function ProfilePageClient({
           )}
 
           {(() => {
-            const websiteUrl = safeUrl(profile.website.startsWith("http") ? profile.website : `https://${profile.website}`);
-            return profile.website && websiteUrl ? (
+            const ws = profile.website;
+            const websiteUrl = ws ? safeUrl(ws.startsWith("http") ? ws : `https://${ws}`) : null;
+            return websiteUrl ? (
             <a
               href={websiteUrl}
               target="_blank"
@@ -263,9 +265,9 @@ export default function ProfilePageClient({
         <div className="text-center mt-12">
           <p className="text-xs opacity-30">
             Powered by{" "}
-            <a href="/" className="underline hover:opacity-60">
+            <Link href="/" className="underline hover:opacity-60">
               CardCrafter
-            </a>
+            </Link>
           </p>
         </div>
       </div>

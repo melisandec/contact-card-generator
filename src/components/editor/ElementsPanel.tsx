@@ -1,7 +1,6 @@
 'use client';
 
 import { useDesignStore } from '@/store/design-store';
-import { generateId } from '@/lib/utils';
 import { Square, Circle, Triangle, Minus, Star, QrCode, Hexagon, Upload } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
