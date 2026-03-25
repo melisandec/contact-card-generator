@@ -26,6 +26,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const { name, color } = await request.json();
+
+    if (color !== undefined && (typeof color !== 'string' || !/^#[0-9A-Fa-f]{6}$/.test(color))) {
+      return NextResponse.json({ error: 'Invalid color format' }, { status: 400 });
+    }
+
     const updated = await prisma.folder.update({
       where: { id },
       data: {

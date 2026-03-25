@@ -10,14 +10,15 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const query = searchParams.get('q') ?? 'background';
-  const page = searchParams.get('page') ?? '1';
-  const perPage = searchParams.get('per_page') ?? '20';
+  const rawQuery = searchParams.get('q') ?? 'background';
+  const query = rawQuery.slice(0, 100);
+  const page = Math.max(1, Math.min(100, parseInt(searchParams.get('page') ?? '1') || 1));
+  const perPage = Math.max(1, Math.min(50, parseInt(searchParams.get('per_page') ?? '20') || 20));
 
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
   if (!accessKey) {
     // Return picsum fallback
-    const photos = Array.from({ length: parseInt(perPage) }, (_, i) => ({
+    const photos = Array.from({ length: perPage }, (_, i) => ({
       id: `picsum-${i}`,
       urls: {
         small: `https://picsum.photos/seed/${query}${i}/400/300`,

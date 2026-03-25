@@ -4,7 +4,8 @@ import QRCode from 'qrcode';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { data, foreground = '#000000', background = '#ffffff', size = 200 } = body;
+    const { data, foreground = '#000000', background = '#ffffff', size: rawSize = 200 } = body;
+    const size = Math.max(50, Math.min(2000, Number(rawSize) || 200));
 
     if (!data) {
       return NextResponse.json({ error: 'Data is required' }, { status: 400 });

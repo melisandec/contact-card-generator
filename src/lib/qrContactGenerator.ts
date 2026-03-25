@@ -39,27 +39,27 @@ export class QRContactGenerator {
       contactData.middleName || '',
       contactData.prefix || '',
       contactData.suffix || '',
-    ];
+    ].map(escapeVCardText);
     vcard += `N:${nameParts.join(';')}\r\n`;
 
     if (contactData.fullName) {
-      vcard += `FN:${contactData.fullName}\r\n`;
+      vcard += `FN:${escapeVCardText(contactData.fullName)}\r\n`;
     }
 
     if (contactData.company) {
-      vcard += `ORG:${contactData.company}`;
+      vcard += `ORG:${escapeVCardText(contactData.company)}`;
       if (contactData.department) {
-        vcard += `;${contactData.department}`;
+        vcard += `;${escapeVCardText(contactData.department)}`;
       }
       vcard += '\r\n';
     }
 
     if (contactData.title) {
-      vcard += `TITLE:${contactData.title}\r\n`;
+      vcard += `TITLE:${escapeVCardText(contactData.title)}\r\n`;
     }
 
     if (contactData.role) {
-      vcard += `ROLE:${contactData.role}\r\n`;
+      vcard += `ROLE:${escapeVCardText(contactData.role)}\r\n`;
     }
 
     contactData.phones?.forEach((phone) => {

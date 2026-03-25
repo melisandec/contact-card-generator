@@ -11,7 +11,7 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const size = parseInt(searchParams.get("size") || "300", 10);
+    const size = Math.max(50, Math.min(2000, parseInt(searchParams.get("size") || "300", 10) || 300));
     const format = searchParams.get("format") || "dataurl"; // 'dataurl' | 'png'
 
     const profile = await prisma.digitalProfile.findFirst({

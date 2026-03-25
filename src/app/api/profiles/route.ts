@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 
 // GET /api/profiles – list the current user's profiles
 export async function GET() {
@@ -88,7 +88,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const generateSlug = () => nanoid(10).toLowerCase().replace(/[^a-z0-9]/g, () => Math.floor(Math.random() * 10).toString());
+    const slugAlphabet = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
+    const generateSlug = () => slugAlphabet();
     let slug = requestedSlug || generateSlug();
     // Check uniqueness
     const existing = await prisma.digitalProfile.findUnique({
