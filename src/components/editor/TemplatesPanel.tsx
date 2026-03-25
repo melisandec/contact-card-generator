@@ -7,15 +7,17 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import type { Template } from '@/types';
+import { AlertTriangle } from 'lucide-react';
 
 const CATEGORIES = ['all', 'corporate', 'creative', 'minimal', 'tech', 'social', 'event', 'real-estate'];
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export function TemplatesPanel() {
-  const { loadDesign, loadFullDesign } = useDesignStore();
+  const { loadDesign, loadFullDesign, elements } = useDesignStore();
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
+  const [pendingTemplate, setPendingTemplate] = useState<Template | null>(null);
 
   const queryParams = new URLSearchParams();
   if (activeCategory !== 'all') queryParams.set('category', activeCategory);
@@ -26,7 +28,7 @@ export function TemplatesPanel() {
     fetcher
   );
 
-  const applyTemplate = (template: Template) => {
+  const doApply = (template: Template) => {
     if (template.isDoubleSided && template.frontLayers && template.backLayers) {
       loadFullDesign({
         frontLayers: template.frontLayers,
@@ -40,10 +42,51 @@ export function TemplatesPanel() {
     } else {
       loadDesign(template.elements, template.background, template.width, template.height);
     }
+    setPendingTemplate(null);
+  };
+
+  const applyTemplate = (template: Template) => {
+    if (elements.length > 0) {
+      setPendingTemplate(template);
+    } else {
+      doApply(template);
+    }
   };
 
   return (
     <div className="p-3 space-y-3">
+      {/* Overwrite confirmation dialog */}
+      {pendingTemplate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl p-5 max-w-sm w-full">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Replace current design?</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Applying &ldquo;{pendingTemplate.name}&rdquo; will replace your current design. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPendingTemplate(null)}
+                className="flex-1 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => doApply(pendingTemplate)}
+                className="flex-1 px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+              >
+                Apply template
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Input
         placeholder="Search templates..."
         value={search}

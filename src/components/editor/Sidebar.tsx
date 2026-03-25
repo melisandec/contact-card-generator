@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useDesignStore } from "@/store/design-store";
 import { useUIStore } from "@/store/ui-store";
 import { TemplatesPanel } from "./TemplatesPanel";
@@ -19,6 +20,7 @@ import {
   Layers,
   ChevronLeft,
   UserCircle,
+  Lock,
 } from "lucide-react";
 import type { SidebarTab } from "@/types";
 
@@ -43,6 +45,8 @@ export function Sidebar() {
     sidebarCollapsed,
     toggleSidebar,
   } = useUIStore();
+  const { data: session, status: authStatus } = useSession();
+  const isGuest = authStatus !== "loading" && !session;
 
   const renderPanel = () => {
     switch (activeSidebarTab) {
@@ -74,25 +78,32 @@ export function Sidebar() {
     >
       {/* Tab icons column */}
       <div className="flex flex-col items-center py-2 w-12 border-r border-slate-100 shrink-0">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setActiveSidebarTab(tab.id);
-              if (sidebarCollapsed) toggleSidebar();
-            }}
-            className={cn(
-              "flex flex-col items-center justify-center w-10 h-12 rounded-lg mb-1 text-xs gap-0.5 transition-colors",
-              activeSidebarTab === tab.id && !sidebarCollapsed
-                ? "bg-indigo-50 text-indigo-600"
-                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
-            )}
-            title={tab.label}
-          >
-            {tab.icon}
-            <span className="text-[9px]">{tab.label}</span>
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const requiresAuth = tab.id === "profile";
+          const showLock = requiresAuth && isGuest;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveSidebarTab(tab.id);
+                if (sidebarCollapsed) toggleSidebar();
+              }}
+              className={cn(
+                "relative flex flex-col items-center justify-center w-10 h-12 rounded-lg mb-1 text-xs gap-0.5 transition-colors",
+                activeSidebarTab === tab.id && !sidebarCollapsed
+                  ? "bg-indigo-50 text-indigo-600"
+                  : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
+              )}
+              title={showLock ? `${tab.label} — Sign in required` : tab.label}
+            >
+              {tab.icon}
+              <span className="text-[9px]">{tab.label}</span>
+              {showLock && (
+                <Lock className="absolute top-1 right-1 w-2.5 h-2.5 text-amber-500" />
+              )}
+            </button>
+          );
+        })}
         <div className="flex-1" />
         <button
           onClick={toggleSidebar}

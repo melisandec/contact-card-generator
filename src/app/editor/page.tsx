@@ -21,7 +21,8 @@ import { useUIStore } from "@/store/ui-store";
 import { useDesign } from "@/hooks/useDesign";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { cn } from "@/lib/utils";
-import { Loader2, UserPlus, Building2, Code2, CloudOff, Check } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Loader2, UserPlus, Building2, Code2, CloudOff, Check, AlertTriangle } from "lucide-react";
 
 function EditorContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,8 @@ function EditorContent() {
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
   const [aiGeneratorOpen, setAiGeneratorOpen] = useState(false);
   const { lastSaved, draftAvailable, restoreDraft, dismissDraft } = useAutoSave();
+  const { data: session, status: authStatus } = useSession();
+  const isGuest = authStatus !== "loading" && !session;
   const {
     zoom,
     setZoom,
@@ -243,9 +246,27 @@ function EditorContent() {
       <EmbedModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} />
       <AIGeneratorModal isOpen={aiGeneratorOpen} onClose={() => setAiGeneratorOpen(false)} />
 
+      {/* Guest warning banner */}
+      {isGuest && (
+        <div className="fixed top-14 left-0 right-0 z-40 bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-amber-800">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />
+            <span className="text-xs font-medium">
+              You&apos;re designing as a guest — your work is stored locally and will be lost if you clear your browser.
+            </span>
+          </div>
+          <a
+            href="/auth/signin"
+            className="shrink-0 px-3 py-1 text-xs font-semibold bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors"
+          >
+            Sign in to save
+          </a>
+        </div>
+      )}
+
       {/* Auto-save draft restore banner */}
       {draftAvailable && (
-        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-amber-200 shadow-lg rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className={`fixed ${isGuest ? "top-28" : "top-16"} left-1/2 transform -translate-x-1/2 z-50 bg-white border border-amber-200 shadow-lg rounded-xl px-4 py-3 flex items-center gap-3`}>
           <CloudOff className="w-4 h-4 text-amber-500 flex-shrink-0" />
           <span className="text-sm text-slate-700">Unsaved draft found. Restore?</span>
           <button
