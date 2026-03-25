@@ -25,6 +25,13 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const collaborator = await prisma.designCollaborator.findUnique({
+      where: { id: collabId },
+    });
+    if (!collaborator || collaborator.designId !== id) {
+      return NextResponse.json({ error: "Collaborator not found" }, { status: 404 });
+    }
+
     await prisma.designCollaborator.delete({ where: { id: collabId } });
     return NextResponse.json({ success: true });
   } catch (error) {

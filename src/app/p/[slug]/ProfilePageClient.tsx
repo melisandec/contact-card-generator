@@ -37,6 +37,15 @@ interface ProfileData {
   };
 }
 
+function safeUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return ['http:', 'https:'].includes(parsed.protocol) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 const SOCIAL_ICONS: Record<string, React.ElementType> = {
   linkedin: Linkedin,
   twitter: Twitter,
@@ -170,13 +179,9 @@ export default function ProfilePageClient({
             </button>
           )}
 
-          {profile.website && (
+          {profile.website && safeUrl(profile.website.startsWith("http") ? profile.website : `https://${profile.website}`) && (
             <a
-              href={
-                profile.website.startsWith("http")
-                  ? profile.website
-                  : `https://${profile.website}`
-              }
+              href={safeUrl(profile.website.startsWith("http") ? profile.website : `https://${profile.website}`)!}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
@@ -233,10 +238,10 @@ export default function ProfilePageClient({
         )}
 
         {/* CTA Button */}
-        {profile.ctaButton && (
+        {profile.ctaButton && safeUrl(profile.ctaButton.url) && (
           <div className="mb-8">
             <a
-              href={profile.ctaButton.url}
+              href={safeUrl(profile.ctaButton.url)!}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full text-center px-5 py-3.5 rounded-xl font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"

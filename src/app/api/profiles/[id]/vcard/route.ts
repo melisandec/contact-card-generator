@@ -60,12 +60,13 @@ export async function GET(
     const generator = new QRContactGenerator(contactData, { format: "vcard" });
     const vcard = generator.generateVCard();
 
-    const filename = `${profile.fullName.replace(/[^a-zA-Z0-9]/g, "_")}.vcf`;
+    const asciiFilename = `${profile.fullName.replace(/[^a-zA-Z0-9]/g, "_")}.vcf`;
+    const encodedFilename = encodeURIComponent(`${profile.fullName}.vcf`);
 
     return new NextResponse(vcard, {
       headers: {
         "Content-Type": "text/vcard; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodedFilename}`,
         "Cache-Control": "no-cache",
       },
     });

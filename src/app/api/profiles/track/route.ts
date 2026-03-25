@@ -16,6 +16,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const profile = await prisma.digitalProfile.findUnique({
+      where: { id: profileId },
+      select: { id: true },
+    });
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
     const headersList = await headers();
     const ip = headersList.get("x-forwarded-for") || "unknown";
     const ipHash = createHash("sha256").update(ip).digest("hex").slice(0, 16);

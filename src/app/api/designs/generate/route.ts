@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // Provider + model combos on the new HF router (free tier via SambaNova)
 const API_BASE = "https://router.huggingface.co/sambanova/v1/chat/completions";
@@ -186,6 +188,11 @@ function parseDesignJSON(text: string): Record<string, unknown> | null {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const apiKey = process.env.HUGGINGFACE_API_KEY;
     if (!apiKey || apiKey.trim().length === 0) {
       return NextResponse.json(

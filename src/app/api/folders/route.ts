@@ -47,10 +47,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
+    const validColor = typeof color === "string" && /^#[0-9A-Fa-f]{6}$/.test(color)
+      ? color
+      : "#6366f1";
+
     const folder = await prisma.folder.create({
       data: {
         name: name.trim(),
-        color: color || "#6366f1",
+        color: validColor,
         userId,
       },
       include: { _count: { select: { designs: true } } },

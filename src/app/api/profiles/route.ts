@@ -81,13 +81,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate or validate slug
-    let slug = requestedSlug || nanoid(8);
+    const SLUG_RE = /^[a-z0-9-]{3,50}$/;
+    if (requestedSlug && !SLUG_RE.test(requestedSlug)) {
+      return NextResponse.json(
+        { error: "Slug must be 3-50 lowercase alphanumeric characters or hyphens" },
+        { status: 400 },
+      );
+    }
+    const generateSlug = () => nanoid(10).toLowerCase().replace(/[^a-z0-9]/g, () => Math.floor(Math.random() * 10).toString());
+    let slug = requestedSlug || generateSlug();
     // Check uniqueness
     const existing = await prisma.digitalProfile.findUnique({
       where: { slug },
     });
     if (existing) {
-      slug = nanoid(10);
+      slug = generateSlug();
     }
 
     const profile = await prisma.digitalProfile.create({

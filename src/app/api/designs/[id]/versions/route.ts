@@ -34,13 +34,22 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    const versions = await prisma.designVersion.findMany({
-      where: { designId: id },
-      orderBy: { version: "desc" },
-      take: 50,
-    });
+    const { searchParams } = new URL(_request.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1") || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? "20") || 20));
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json(versions);
+    const [versions, total] = await Promise.all([
+      prisma.designVersion.findMany({
+        where: { designId: id },
+        orderBy: { version: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.designVersion.count({ where: { designId: id } }),
+    ]);
+
+    return NextResponse.json({ versions, total, page, limit });
   } catch (error) {
     console.error("Failed to fetch versions:", error);
     return NextResponse.json(

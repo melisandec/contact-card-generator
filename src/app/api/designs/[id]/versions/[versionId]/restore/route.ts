@@ -51,13 +51,17 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
       },
     });
 
+    if (!version.data || typeof version.data !== 'object' || Array.isArray(version.data)) {
+      return NextResponse.json({ error: 'Version data is corrupt' }, { status: 422 });
+    }
+
     // Restore the design to the selected version
     const updated = await prisma.design.update({
       where: { id },
       data: {
-        data: version.data as object,
-        frontLayers: (version.frontLayers as object) ?? undefined,
-        backLayers: (version.backLayers as object) ?? undefined,
+        data: version.data,
+        frontLayers: version.frontLayers ?? undefined,
+        backLayers: version.backLayers ?? undefined,
         isDoubleSided: version.isDoubleSided,
         width: version.width,
         height: version.height,

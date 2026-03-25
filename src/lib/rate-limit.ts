@@ -23,6 +23,7 @@ export async function checkRateLimit(
 ): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
   const rl = getRatelimit();
   if (!rl) {
+    console.warn('[rate-limit] Upstash Redis not configured — rate limiting is disabled. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to enable it.');
     return { success: true, limit: 10, remaining: 10, reset: Date.now() };
   }
 

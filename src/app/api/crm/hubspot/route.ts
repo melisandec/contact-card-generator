@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { apiKey, properties } = body as {
@@ -14,6 +20,12 @@ export async function POST(request: NextRequest) {
 
     if (!properties || Object.keys(properties).length === 0) {
       return NextResponse.json({ error: 'At least one property is required' }, { status: 400 });
+    }
+
+    const ALLOWED_FIELDS = new Set(['firstname', 'lastname', 'email', 'phone', 'company', 'jobtitle', 'website', 'address']);
+    const invalidFields = Object.keys(properties).filter((k) => !ALLOWED_FIELDS.has(k));
+    if (invalidFields.length > 0) {
+      return NextResponse.json({ error: `Invalid CRM fields: ${invalidFields.join(', ')}` }, { status: 400 });
     }
 
     // Validate required email field
