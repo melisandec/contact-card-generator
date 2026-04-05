@@ -97,13 +97,13 @@ export default function HomePage() {
                 href="/auth/signin"
                 className="text-sm text-white/70 hover:text-white transition-colors"
               >
-                Sign In
+                Sign in
               </Link>
               <Link
-                href="/editor"
+                href="/auth/signup"
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
               >
-                Start Designing
+                Get started
               </Link>
             </div>
           </div>

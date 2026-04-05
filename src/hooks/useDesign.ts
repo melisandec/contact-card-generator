@@ -210,12 +210,13 @@ export async function removeCollaborator(
 // ── Version History ─────────────────────────────────────────────────
 
 export function useVersions(designId: string) {
-  const { data, error, isLoading, mutate } = useSWR<DesignVersion[]>(
+  const { data, error, isLoading, mutate } = useSWR<{ versions: DesignVersion[]; total: number; page: number; limit: number }>(
     designId ? `/api/designs/${designId}/versions` : null,
     fetcher,
   );
   return {
-    versions: Array.isArray(data) ? data : [],
+    versions: Array.isArray(data?.versions) ? data.versions : [],
+    total: data?.total ?? 0,
     isLoading,
     error,
     mutate,

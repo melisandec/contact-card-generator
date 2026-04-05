@@ -29,10 +29,10 @@ export function Header() {
       <div className="flex-1" />
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm">
-          Sign in
-        </Button>
-        <Link href="/editor">
+        <Link href="/auth/signin">
+          <Button variant="ghost" size="sm">Sign in</Button>
+        </Link>
+        <Link href="/auth/signup">
           <Button size="sm">Get started</Button>
         </Link>
       </div>
