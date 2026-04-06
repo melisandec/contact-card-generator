@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useDesignStore } from '@/store/design-store';
 import { Input } from '@/components/ui/Input';
@@ -21,6 +21,7 @@ import {
   Eye,
   EyeOff,
   Unlink2,
+  RefreshCw,
 } from 'lucide-react';
 import type { DesignElement } from '@/types';
 import { FIELD_TYPE_OPTIONS } from '@/lib/fieldSync';
@@ -31,6 +32,7 @@ export function PropertiesPanel() {
     globalStyles, applyGlobalColorToElement, applyGlobalFontToElement, unlinkElementStyle,
   } = useDesignStore();
   const [colorPickerTarget, setColorPickerTarget] = useState<'fill' | 'stroke' | 'color' | null>(null);
+  const [qrRegenerating, setQrRegenerating] = useState(false);
 
   const selected = elements.find((e) => e.id === selectedElementId);
 
@@ -47,6 +49,33 @@ export function PropertiesPanel() {
   }
 
   const update = (updates: Partial<DesignElement>) => updateElement(selected.id, updates);
+
+  const regenerateQR = useCallback(async () => {
+    if (!selected || selected.type !== 'qrcode' || !selected.qrData) return;
+    setQrRegenerating(true);
+    try {
+      const fgColor = selected.qrStyle?.gradient?.colors[0] ?? '#000000';
+      const bgColor = selected.qrStyle?.backgroundColor ?? '#ffffff';
+      const res = await fetch('/api/qrcode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: selected.qrData,
+          size: 400,
+          fg: fgColor,
+          bg: bgColor,
+        }),
+      });
+      const json = await res.json();
+      if (json.dataUrl) {
+        updateElement(selected.id, { src: json.dataUrl });
+      }
+    } catch (err) {
+      console.error('QR regeneration failed:', err);
+    } finally {
+      setQrRegenerating(false);
+    }
+  }, [selected, updateElement]);
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -435,6 +464,16 @@ export function PropertiesPanel() {
                   </button>
                 )}
               </div>
+              {selected.qrData && (
+                <button
+                  onClick={regenerateQR}
+                  disabled={qrRegenerating}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${qrRegenerating ? 'animate-spin' : ''}`} />
+                  {qrRegenerating ? 'Regenerating…' : 'Regenerate QR'}
+                </button>
+              )}
             </div>
           </Section>
         )}

@@ -220,15 +220,56 @@ function CanvasElement({ element, isSelected, isMultiSelected, isEditing, zoom, 
           </div>
         );
 
-      case 'qrcode':
-        return element.src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={element.src} alt="QR Code" style={{ width: '100%', height: '100%' }} draggable={false} />
-        ) : (
-          <div className="w-full h-full bg-white flex items-center justify-center text-slate-400 text-xs border border-slate-200">
-            QR Code
+      case 'qrcode': {
+        if (!element.src) {
+          return (
+            <div className="w-full h-full bg-white flex items-center justify-center text-slate-400 text-xs border border-slate-200">
+              QR Code
+            </div>
+          );
+        }
+        const qrBg = element.qrStyle?.backgroundColor ?? '#ffffff';
+        const gradient = element.qrStyle?.gradient;
+        const gradientCss = gradient
+          ? gradient.type === 'linear'
+            ? `linear-gradient(135deg, ${gradient.colors[0] ?? '#000'}, ${gradient.colors[1] ?? '#6366f1'})`
+            : `radial-gradient(circle, ${gradient.colors[0] ?? '#000'}, ${gradient.colors[1] ?? '#6366f1'})`
+          : undefined;
+        const logoUrl = element.qrStyle?.logoUrl;
+        const logoSize = element.qrStyle?.logoSize ?? 20;
+        return (
+          <div className="relative w-full h-full overflow-hidden" style={{ backgroundColor: qrBg }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={element.src} alt="QR Code" style={{ width: '100%', height: '100%', display: 'block' }} draggable={false} />
+            {gradientCss && (
+              <div
+                style={{
+                  position: 'absolute', inset: 0,
+                  background: gradientCss,
+                  mixBlendMode: 'multiply',
+                  pointerEvents: 'none',
+                }}
+              />
+            )}
+            {logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt="Logo"
+                style={{
+                  position: 'absolute',
+                  top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: `${logoSize}%`, height: `${logoSize}%`,
+                  objectFit: 'contain',
+                  pointerEvents: 'none',
+                }}
+                draggable={false}
+              />
+            )}
           </div>
         );
+      }
 
       case 'shape':
         return null;

@@ -5,6 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useDesignStore } from "@/store/design-store";
 import {
   useProfiles,
+  useProfileAnalytics,
   createProfile,
   updateProfile,
   deleteProfile,
@@ -41,6 +42,9 @@ import {
   AlertCircle,
   ArrowDownToLine,
   ArrowUpFromLine,
+  BarChart2,
+  Link,
+  TrendingUp,
 } from "lucide-react";
 import { cardToProfile, profileToCard, type ProfileData } from "@/lib/fieldSync";
 
@@ -93,10 +97,14 @@ export function DigitalProfilePanel() {
     cta: false,
     theme: false,
     analytics: false,
+    vanityUrl: false,
   });
+
+  const { analytics } = useProfileAnalytics(selectedProfileId ?? "");
 
   // Form state
   const [form, setForm] = useState({
+    slug: "",
     fullName: "",
     firstName: "",
     lastName: "",
@@ -119,6 +127,7 @@ export function DigitalProfilePanel() {
       const p = profiles.find((pr) => pr.id === selectedProfileId);
       if (p) {
         setForm({
+          slug: p.slug || "",
           fullName: p.fullName,
           firstName: p.firstName || "",
           lastName: p.lastName || "",
@@ -150,6 +159,7 @@ export function DigitalProfilePanel() {
       if (selectedProfileId) {
         await updateProfile(selectedProfileId, {
           ...form,
+          slug: form.slug || undefined,
           designId: currentDesignId,
         } as Partial<DigitalProfile>);
       } else {
@@ -312,6 +322,7 @@ export function DigitalProfilePanel() {
             onClick={() => {
               setIsCreating(true);
               setForm({
+                slug: "",
                 fullName: "",
                 firstName: "",
                 lastName: "",
@@ -692,6 +703,143 @@ export function DigitalProfilePanel() {
             </select>
           </div>
         </div>
+      )}
+
+      {/* Section: Vanity URL */}
+      <SectionHeader
+        title="Profile URL"
+        expanded={expandedSections.vanityUrl}
+        onToggle={() => toggleSection("vanityUrl")}
+      />
+      {expandedSections.vanityUrl && (
+        <div className="space-y-2">
+          <div>
+            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+              Custom slug
+            </label>
+            <div className="flex items-center mt-0.5 rounded-md border border-slate-200 overflow-hidden focus-within:ring-1 focus-within:ring-indigo-300 focus-within:border-indigo-300">
+              <span className="px-2 py-1.5 text-[10px] text-slate-400 bg-slate-50 border-r border-slate-200 whitespace-nowrap">
+                /p/
+              </span>
+              <input
+                type="text"
+                value={form.slug}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                  }))
+                }
+                placeholder="your-name"
+                className="flex-1 px-2 py-1.5 text-xs bg-white outline-none"
+              />
+            </div>
+            <p className="mt-1 text-[10px] text-slate-400">
+              3–40 lowercase letters, numbers, and hyphens. Save to apply.
+            </p>
+          </div>
+          {selectedProfileId && (
+            <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-100">
+              <Link className="w-3 h-3 text-slate-400 shrink-0" />
+              <span className="text-[10px] text-slate-500 truncate flex-1">
+                cardcrafter.app/p/{form.slug || "…"}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Section: Analytics */}
+      {selectedProfileId && (
+        <>
+          <SectionHeader
+            title="Analytics"
+            expanded={expandedSections.analytics}
+            onToggle={() => toggleSection("analytics")}
+          />
+          {expandedSections.analytics && (
+            <div className="space-y-3">
+              {analytics ? (
+                <>
+                  {/* Summary stats */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-indigo-50 rounded-lg p-2.5 text-center">
+                      <p className="text-xl font-bold text-indigo-700">
+                        {analytics.totalViews.toLocaleString()}
+                      </p>
+                      <p className="text-[10px] text-indigo-500 mt-0.5">Total Views</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded-lg p-2.5 text-center">
+                      <p className="text-xl font-bold text-emerald-700">
+                        {analytics.last7Days.toLocaleString()}
+                      </p>
+                      <p className="text-[10px] text-emerald-500 mt-0.5">Last 7 Days</p>
+                    </div>
+                  </div>
+
+                  {/* Action breakdown */}
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Actions
+                    </p>
+                    {[
+                      { key: "save_contact", label: "Saved Contact", color: "bg-indigo-400" },
+                      { key: "email", label: "Email Clicks", color: "bg-blue-400" },
+                      { key: "call", label: "Call Clicks", color: "bg-green-400" },
+                      { key: "social_click", label: "Social Clicks", color: "bg-purple-400" },
+                    ].map(({ key, label, color }) => {
+                      const count = analytics.actions[key as keyof typeof analytics.actions] ?? 0;
+                      const max = Math.max(1, ...Object.values(analytics.actions));
+                      const pct = Math.round((count / max) * 100);
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-[10px] text-slate-500 w-24 shrink-0">{label}</span>
+                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${color} transition-all`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-medium text-slate-600 w-6 text-right">
+                            {count}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Daily sparkline */}
+                  {analytics.dailyViews.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Daily Views (last 14 days)
+                      </p>
+                      <div className="flex items-end gap-0.5 h-12">
+                        {analytics.dailyViews.slice(-14).map((d, i) => {
+                          const maxCount = Math.max(1, ...analytics.dailyViews.map((x) => x.count));
+                          const h = Math.max(2, Math.round((d.count / maxCount) * 44));
+                          return (
+                            <div
+                              key={i}
+                              title={`${d.date}: ${d.count} views`}
+                              className="flex-1 bg-indigo-300 hover:bg-indigo-400 rounded-sm transition-colors cursor-default"
+                              style={{ height: h }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex items-center justify-center gap-2 py-6 text-slate-400">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs">No analytics data yet</span>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Sync Buttons */}

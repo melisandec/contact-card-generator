@@ -72,6 +72,7 @@ export async function PUT(
 
     const body = await request.json();
     const {
+      slug: requestedSlug,
       fullName,
       firstName,
       lastName,
@@ -90,9 +91,32 @@ export async function PUT(
       isPublic,
     } = body;
 
+    // Validate and check slug uniqueness if provided
+    let slugUpdate: string | undefined;
+    if (requestedSlug !== undefined && requestedSlug !== existing.slug) {
+      const SLUG_RE = /^[a-z0-9-]{3,40}$/;
+      if (!SLUG_RE.test(requestedSlug)) {
+        return NextResponse.json(
+          { error: "Slug must be 3–40 lowercase letters, numbers, or hyphens." },
+          { status: 400 },
+        );
+      }
+      const taken = await prisma.digitalProfile.findFirst({
+        where: { slug: requestedSlug, id: { not: id } },
+      });
+      if (taken) {
+        return NextResponse.json(
+          { error: "That URL is already taken. Please choose another." },
+          { status: 409 },
+        );
+      }
+      slugUpdate = requestedSlug;
+    }
+
     const profile = await prisma.digitalProfile.update({
       where: { id },
       data: {
+        ...(slugUpdate !== undefined && { slug: slugUpdate }),
         ...(fullName !== undefined && { fullName }),
         ...(firstName !== undefined && { firstName }),
         ...(lastName !== undefined && { lastName }),
