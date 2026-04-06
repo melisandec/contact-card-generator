@@ -91,11 +91,16 @@ export async function POST(request: NextRequest) {
     const slugAlphabet = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
     const generateSlug = () => slugAlphabet();
     let slug = requestedSlug || generateSlug();
-    // Check uniqueness
-    const existing = await prisma.digitalProfile.findUnique({
-      where: { slug },
-    });
-    if (existing) {
+    // Ensure slug uniqueness with retry loop
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const existing = await prisma.digitalProfile.findUnique({ where: { slug } });
+      if (!existing) break;
+      if (requestedSlug) {
+        return NextResponse.json(
+          { error: "That slug is already taken. Please choose another." },
+          { status: 409 }
+        );
+      }
       slug = generateSlug();
     }
 

@@ -1,21 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 
+const HEX_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { data, foreground = '#000000', background = '#ffffff', size: rawSize = 200 } = body;
     const size = Math.max(50, Math.min(2000, Number(rawSize) || 200));
 
-    if (!data) {
+    if (!data || typeof data !== 'string') {
       return NextResponse.json({ error: 'Data is required' }, { status: 400 });
     }
+    if (data.length > 2048) {
+      return NextResponse.json({ error: 'Data exceeds maximum length of 2048 characters' }, { status: 400 });
+    }
+
+    const fg = HEX_COLOR_RE.test(foreground) ? foreground : '#000000';
+    const bg = HEX_COLOR_RE.test(background) ? background : '#ffffff';
 
     const dataUrl = await QRCode.toDataURL(data, {
       width: size,
       color: {
-        dark: foreground,
-        light: background,
+        dark: fg,
+        light: bg,
       },
       margin: 1,
     });
@@ -33,6 +41,9 @@ export async function GET(request: NextRequest) {
 
   if (!data) {
     return NextResponse.json({ error: 'Data is required' }, { status: 400 });
+  }
+  if (data.length > 2048) {
+    return NextResponse.json({ error: 'Data exceeds maximum length' }, { status: 400 });
   }
 
   try {

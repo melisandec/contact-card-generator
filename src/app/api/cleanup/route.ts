@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 // Weekly cleanup job - removes designs older than 6 months for guest-equivalent inactive users
 export async function GET(request: NextRequest) {
   // Verify this is called from Vercel Cron (via Authorization header)
+  if (!process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Not configured' }, { status: 503 });
+  }
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

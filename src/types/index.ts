@@ -89,6 +89,9 @@ export interface DesignElement {
   qrForeground?: string;
   qrBackground?: string;
   qrStyle?: QRStyle;
+  // 'url' = plain URL, 'profile' = dynamic /p/{slug} link, 'vcard' = contact data embedded offline
+  qrType?: 'url' | 'profile' | 'vcard';
+  qrLinkedProfileId?: string;
 
   // Icon
   iconName?: string;

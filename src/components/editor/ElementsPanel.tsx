@@ -1,10 +1,13 @@
 'use client';
 
 import { useDesignStore } from '@/store/design-store';
-import { Square, Circle, Triangle, Minus, Star, QrCode, Hexagon, Upload } from 'lucide-react';
+import { Square, Circle, Triangle, Minus, Star, QrCode, Hexagon, Upload, Link2, CreditCard, Globe } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useProfiles, getProfileQR } from '@/hooks/useProfile';
+import { QRContactGenerator } from '@/lib/qrContactGenerator';
+import type { ContactData } from '@/types';
 
 const shapes = [
   { type: 'rectangle', label: 'Rectangle', icon: Square },
@@ -15,10 +18,15 @@ const shapes = [
   { type: 'polygon', label: 'Polygon', icon: Hexagon },
 ];
 
+type QRMode = 'url' | 'profile' | 'vcard';
+
 export function ElementsPanel() {
-  const { addElement } = useDesignStore();
+  const { addElement, elements } = useDesignStore();
   const [qrUrl, setQrUrl] = useState('https://cardcrafter.app');
   const [qrLoading, setQrLoading] = useState(false);
+  const [qrMode, setQrMode] = useState<QRMode>('url');
+  const [selectedProfileId, setSelectedProfileId] = useState('');
+  const { profiles } = useProfiles();
 
   const addShape = (shapeType: string) => {
     const isLine = shapeType === 'line';
@@ -71,30 +79,71 @@ export function ElementsPanel() {
     input.click();
   }, [addElement]);
 
+  // Build a ContactData object from field-typed text elements on the canvas
+  const buildContactDataFromCard = (): ContactData => {
+    const get = (fieldType: string) =>
+      (elements as Array<{ fieldType?: string; content?: string }>)
+        .find((el) => el.fieldType === fieldType)?.content ?? '';
+
+    const name = get('name') || 'Unknown';
+    const parts = name.trim().split(/\s+/);
+    return {
+      fullName: name,
+      firstName: parts[0] || undefined,
+      lastName: parts.slice(1).join(' ') || undefined,
+      title: get('title') || undefined,
+      company: get('company') || undefined,
+      phones: get('phone') ? [{ type: 'mobile' as const, number: get('phone'), preferred: true }] : [],
+      emails: get('email') ? [{ type: 'work' as const, address: get('email'), preferred: true }] : [],
+      websites: get('website') ? [{ type: 'work' as const, url: get('website') }] : [],
+    };
+  };
+
   const addQRCode = async () => {
-    if (!qrUrl.trim()) return;
     setQrLoading(true);
     try {
+      let qrPayload = '';
+      let linkedProfileId: string | undefined;
+
+      if (qrMode === 'url') {
+        if (!qrUrl.trim()) return;
+        qrPayload = qrUrl.trim();
+      } else if (qrMode === 'profile') {
+        if (!selectedProfileId) return;
+        const qrResult = await getProfileQR(selectedProfileId, 400);
+        qrPayload = qrResult.profileUrl;
+        linkedProfileId = selectedProfileId;
+        addElement({
+          type: 'qrcode',
+          x: 100, y: 100, width: 150, height: 150,
+          rotation: 0, opacity: 1, locked: false, visible: true, zIndex: 0,
+          src: qrResult.dataUrl,
+          qrData: qrResult.profileUrl,
+          qrType: 'profile',
+          qrLinkedProfileId: linkedProfileId,
+        });
+        return;
+      } else if (qrMode === 'vcard') {
+        const contactData = buildContactDataFromCard();
+        const generator = new QRContactGenerator(contactData);
+        qrPayload = generator.generateVCard();
+      }
+
       const res = await fetch('/api/qrcode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: qrUrl, size: 200 }),
+        body: JSON.stringify({ data: qrPayload, size: 400 }),
       });
       const data = await res.json();
       if (data.dataUrl) {
         addElement({
           type: 'qrcode',
-          x: 100,
-          y: 100,
-          width: 150,
-          height: 150,
-          rotation: 0,
-          opacity: 1,
-          locked: false,
-          visible: true,
-          zIndex: 0,
+          x: 100, y: 100, width: 150, height: 150,
+          rotation: 0, opacity: 1, locked: false, visible: true, zIndex: 0,
           src: data.dataUrl,
-          qrData: qrUrl,
+          qrData: qrPayload,
+          qrType: qrMode,
+          ...(linkedProfileId ? { qrLinkedProfileId: linkedProfileId } : {}),
         });
       }
     } catch (error) {
@@ -135,21 +184,83 @@ export function ElementsPanel() {
       {/* QR Code */}
       <div>
         <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">QR Code</h4>
+
+        {/* Mode Tabs */}
+        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-3">
+          {([
+            { id: 'url', label: 'URL', icon: Globe },
+            { id: 'profile', label: 'Profile', icon: Link2 },
+            { id: 'vcard', label: 'Contact', icon: CreditCard },
+          ] as { id: QRMode; label: string; icon: React.ElementType }[]).map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setQrMode(id)}
+              className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-xs font-medium transition-all ${
+                qrMode === id
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Icon className="w-3 h-3" />
+              {label}
+            </button>
+          ))}
+        </div>
+
         <div className="space-y-2">
-          <Input
-            placeholder="https://example.com"
-            value={qrUrl}
-            onChange={(e) => setQrUrl(e.target.value)}
-          />
+          {qrMode === 'url' && (
+            <Input
+              placeholder="https://example.com"
+              value={qrUrl}
+              onChange={(e) => setQrUrl(e.target.value)}
+            />
+          )}
+
+          {qrMode === 'profile' && (
+            <div className="space-y-2">
+              {profiles.length === 0 ? (
+                <p className="text-xs text-slate-400 text-center py-2">
+                  No profiles yet. Create one in the Profile tab.
+                </p>
+              ) : (
+                <select
+                  value={selectedProfileId}
+                  onChange={(e) => setSelectedProfileId(e.target.value)}
+                  className="w-full h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                >
+                  <option value="">Select a profile…</option>
+                  {profiles.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.fullName} — /{p.slug}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <p className="text-xs text-slate-400 leading-relaxed">
+                The QR links to your live profile page. Update your info anytime without reprinting.
+              </p>
+            </div>
+          )}
+
+          {qrMode === 'vcard' && (
+            <p className="text-xs text-slate-400 leading-relaxed py-1">
+              Encodes your card&apos;s contact fields directly in the QR. Works offline — no internet needed to save the contact.
+            </p>
+          )}
+
           <Button
             variant="outline"
             size="sm"
             onClick={addQRCode}
             loading={qrLoading}
+            disabled={
+              (qrMode === 'url' && !qrUrl.trim()) ||
+              (qrMode === 'profile' && !selectedProfileId)
+            }
             className="w-full"
             leftIcon={<QrCode className="w-4 h-4" />}
           >
-            Add QR Code
+            {qrMode === 'profile' ? 'Add Dynamic QR' : qrMode === 'vcard' ? 'Add Contact QR' : 'Add QR Code'}
           </Button>
         </div>
       </div>

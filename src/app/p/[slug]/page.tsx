@@ -82,6 +82,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     }>) || [];
   const ctaButton = profile.ctaButton as { label: string; url: string } | null;
 
+  // Fetch design thumbnail if this profile has a linked design
+  let designThumbnail: string | null = null;
+  if (profile.designId) {
+    const design = await prisma.design.findUnique({
+      where: { id: profile.designId },
+      select: { thumbnailUrl: true, thumbnail: true },
+    });
+    designThumbnail = design?.thumbnailUrl ?? design?.thumbnail ?? null;
+  }
+
   return (
     <ProfilePageClient
       profile={{
@@ -101,6 +111,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         ctaButton,
         theme,
       }}
+      designThumbnail={designThumbnail}
     />
   );
 }

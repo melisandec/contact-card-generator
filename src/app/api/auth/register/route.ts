@@ -1,14 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 5 registrations per hour per IP
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const rl = await checkRateLimit(`register:${ip}`);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { firstName, lastName, email, password } = await request.json();
 
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
         { error: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      typeof firstName !== "string" || firstName.trim().length > 50 ||
+      typeof lastName !== "string" || lastName.trim().length > 50 ||
+      typeof email !== "string" || email.length > 254 ||
+      typeof password !== "string" || password.length > 128
+    ) {
+      return NextResponse.json(
+        { error: "Invalid input" },
         { status: 400 }
       );
     }

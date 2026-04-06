@@ -196,11 +196,8 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.HUGGINGFACE_API_KEY;
     if (!apiKey || apiKey.trim().length === 0) {
       return NextResponse.json(
-        {
-          error:
-            "HUGGINGFACE_API_KEY not configured. Add your Hugging Face API token to .env.local. Get a free key at https://huggingface.co/settings/tokens",
-        },
-        { status: 500 },
+        { error: "AI generation is not available. Please contact support." },
+        { status: 503 },
       );
     }
 

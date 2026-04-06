@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Mail,
   Phone,
@@ -13,6 +14,8 @@ import {
   Github,
   Facebook,
   Youtube,
+  CheckCircle2,
+  Layers,
 } from "lucide-react";
 
 interface ProfileData {
@@ -41,7 +44,7 @@ interface ProfileData {
 function safeUrl(url: string): string | null {
   try {
     const parsed = new URL(url);
-    return ['http:', 'https:'].includes(parsed.protocol) ? url : null;
+    return ["http:", "https:"].includes(parsed.protocol) ? url : null;
   } catch {
     return null;
   }
@@ -70,15 +73,19 @@ function trackAction(
 
 export default function ProfilePageClient({
   profile,
+  designThumbnail,
 }: {
   profile: ProfileData;
+  designThumbnail?: string | null;
 }) {
   const { theme } = profile;
+  const [saved, setSaved] = useState(false);
 
   const handleSaveContact = async () => {
     trackAction(profile.id, "save_contact");
-    // Download vCard
+    setSaved(true);
     window.location.href = `/api/profiles/${profile.id}/vcard`;
+    setTimeout(() => setSaved(false), 3000);
   };
 
   const handleEmail = () => {
@@ -96,179 +103,221 @@ export default function ProfilePageClient({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const websiteUrl = profile.website
+    ? safeUrl(
+        profile.website.startsWith("http")
+          ? profile.website
+          : `https://${profile.website}`,
+      )
+    : null;
+
+  // Derive a subtle tinted hero bg from the primary color
+  const heroBg = `linear-gradient(160deg, ${theme.primaryColor}22 0%, ${theme.backgroundColor} 55%)`;
+
   return (
     <div
-      className="min-h-screen flex items-start justify-center p-4 sm:p-8"
+      className="min-h-screen"
       style={{
-        backgroundColor: theme.backgroundColor,
+        background: theme.backgroundColor,
         color: theme.textColor,
         fontFamily: `'${theme.font}', system-ui, sans-serif`,
       }}
     >
-      <div className="w-full max-w-md mx-auto py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          {profile.photoUrl && (
-            <div className="relative mx-auto w-28 h-28 mb-4">
+      {/* Hero section */}
+      <div
+        className="relative pb-24 pt-12 px-4"
+        style={{ background: heroBg }}
+      >
+        {/* Decorative blob */}
+        <div
+          className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10 blur-3xl pointer-events-none"
+          style={{ background: theme.primaryColor, transform: "translate(30%, -30%)" }}
+        />
+
+        <div className="max-w-md mx-auto text-center">
+          {/* Card design thumbnail — shown if design is linked */}
+          {designThumbnail && (
+            <div className="mb-6 flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={designThumbnail}
+                alt={`${profile.fullName}'s card`}
+                className="w-72 rounded-2xl shadow-2xl ring-1 ring-black/10"
+                style={{ aspectRatio: "1.75 / 1", objectFit: "cover" }}
+              />
+            </div>
+          )}
+
+          {/* Avatar — shown when no card thumbnail */}
+          {!designThumbnail && profile.photoUrl && (
+            <div className="relative mx-auto w-28 h-28 mb-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile.photoUrl}
                 alt={profile.fullName}
-                className="w-28 h-28 rounded-full object-cover border-4 shadow-lg"
-                style={{ borderColor: theme.primaryColor }}
+                className="w-28 h-28 rounded-full object-cover shadow-xl ring-4"
+                style={{ borderColor: theme.primaryColor, border: `4px solid ${theme.primaryColor}` }}
               />
             </div>
           )}
-          <h1 className="text-2xl font-bold">{profile.fullName}</h1>
+
+          {/* Initials avatar fallback */}
+          {!designThumbnail && !profile.photoUrl && (
+            <div
+              className="mx-auto w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold shadow-lg mb-5"
+              style={{ backgroundColor: theme.primaryColor, color: "#fff" }}
+            >
+              {(profile.firstName?.[0] ?? profile.fullName[0] ?? "?").toUpperCase()}
+            </div>
+          )}
+
+          <h1 className="text-3xl font-bold tracking-tight">{profile.fullName}</h1>
           {(profile.title || profile.company) && (
-            <p className="mt-1 text-sm opacity-70">
+            <p className="mt-2 text-base opacity-60">
               {profile.title}
-              {profile.title && profile.company && " at "}
+              {profile.title && profile.company && " · "}
               {profile.company}
             </p>
           )}
-        </div>
 
-        {/* Contact Buttons */}
-        <div className="space-y-3 mb-8">
-          <button
-            onClick={handleSaveContact}
-            className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-            style={{
-              backgroundColor: theme.primaryColor,
-              color: "#ffffff",
-            }}
-          >
-            <Download className="w-5 h-5" />
-            Save Contact
-          </button>
-
-          {profile.email && (
-            <button
-              onClick={handleEmail}
-              className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
-              style={{
-                borderColor: theme.primaryColor + "40",
-                color: theme.textColor,
-              }}
-            >
-              <Mail className="w-5 h-5" style={{ color: theme.primaryColor }} />
-              Send Email
-              <span className="ml-auto text-xs opacity-50 truncate max-w-[180px]">
-                {profile.email}
-              </span>
-            </button>
-          )}
-
-          {profile.phone && (
-            <button
-              onClick={handleCall}
-              className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
-              style={{
-                borderColor: theme.primaryColor + "40",
-                color: theme.textColor,
-              }}
-            >
-              <Phone
-                className="w-5 h-5"
-                style={{ color: theme.primaryColor }}
-              />
-              Call
-              <span className="ml-auto text-xs opacity-50">
-                {profile.phone}
-              </span>
-            </button>
-          )}
-
-          {(() => {
-            const ws = profile.website;
-            const websiteUrl = ws ? safeUrl(ws.startsWith("http") ? ws : `https://${ws}`) : null;
-            return websiteUrl ? (
-            <a
-              href={websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center gap-3 px-5 py-3.5 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
-              style={{
-                borderColor: theme.primaryColor + "40",
-                color: theme.textColor,
-              }}
-              onClick={() =>
-                trackAction(profile.id, "social_click", { platform: "website" })
-              }
-            >
-              <Globe
-                className="w-5 h-5"
-                style={{ color: theme.primaryColor }}
-              />
-              Visit Website
-              <ExternalLink className="w-3.5 h-3.5 ml-auto opacity-40" />
-            </a>
-            ) : null;
-          })()}
-        </div>
-
-        {/* Social Links */}
-        {profile.socialLinks.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center justify-center gap-4 flex-wrap">
+          {/* Social icons */}
+          {profile.socialLinks.length > 0 && (
+            <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
               {profile.socialLinks.map((link, idx) => {
                 const IconComponent = SOCIAL_ICONS[link.platform] || Globe;
                 return (
                   <button
                     key={idx}
                     onClick={() => handleSocialClick(link.platform, link.url)}
-                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
                     style={{
-                      backgroundColor: theme.primaryColor + "15",
+                      backgroundColor: theme.primaryColor + "18",
                       color: theme.primaryColor,
                     }}
                     title={link.platform}
                   >
-                    <IconComponent className="w-5 h-5" />
+                    <IconComponent className="w-4 h-4" />
                   </button>
                 );
               })}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        {/* Bio */}
-        {profile.bio && (
-          <div className="mb-8 text-center">
-            <p className="text-sm leading-relaxed opacity-80 whitespace-pre-line">
+      {/* Floating action card */}
+      <div className="max-w-md mx-auto px-4 -mt-12 relative z-10">
+        <div
+          className="rounded-2xl shadow-xl p-5 space-y-3"
+          style={{ backgroundColor: theme.backgroundColor, border: `1px solid ${theme.primaryColor}18` }}
+        >
+          {/* Save Contact — primary CTA */}
+          <button
+            onClick={handleSaveContact}
+            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl font-semibold text-base transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+            style={{
+              backgroundColor: theme.primaryColor,
+              color: "#ffffff",
+            }}
+          >
+            {saved ? (
+              <>
+                <CheckCircle2 className="w-5 h-5" />
+                Downloading contact…
+              </>
+            ) : (
+              <>
+                <Download className="w-5 h-5" />
+                Save to Contacts
+              </>
+            )}
+          </button>
+
+          <div className="flex gap-3">
+            {profile.email && (
+              <button
+                onClick={handleEmail}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
+                style={{
+                  borderColor: theme.primaryColor + "40",
+                  color: theme.textColor,
+                }}
+              >
+                <Mail className="w-4 h-4" style={{ color: theme.primaryColor }} />
+                Email
+              </button>
+            )}
+            {profile.phone && (
+              <button
+                onClick={handleCall}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
+                style={{
+                  borderColor: theme.primaryColor + "40",
+                  color: theme.textColor,
+                }}
+              >
+                <Phone className="w-4 h-4" style={{ color: theme.primaryColor }} />
+                Call
+              </button>
+            )}
+            {websiteUrl && (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackAction(profile.id, "social_click", { platform: "website" })}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm border transition-all hover:shadow-sm active:scale-[0.98]"
+                style={{
+                  borderColor: theme.primaryColor + "40",
+                  color: theme.textColor,
+                }}
+              >
+                <Globe className="w-4 h-4" style={{ color: theme.primaryColor }} />
+                Web
+              </a>
+            )}
+          </div>
+
+          {/* Bio */}
+          {profile.bio && (
+            <p
+              className="text-sm leading-relaxed opacity-70 pt-1 whitespace-pre-line text-center"
+            >
               {profile.bio}
             </p>
-          </div>
-        )}
+          )}
 
-        {/* CTA Button */}
-        {profile.ctaButton && safeUrl(profile.ctaButton.url) && (
-          <div className="mb-8">
+          {/* CTA Button */}
+          {profile.ctaButton && safeUrl(profile.ctaButton.url) && (
             <a
               href={safeUrl(profile.ctaButton.url)!}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center px-5 py-3.5 rounded-xl font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 w-full px-5 py-3.5 rounded-xl font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
               style={{
-                backgroundColor: theme.primaryColor,
-                color: "#ffffff",
+                backgroundColor: theme.primaryColor + "15",
+                color: theme.primaryColor,
               }}
             >
               {profile.ctaButton.label}
-              <ExternalLink className="w-3.5 h-3.5 inline-block ml-2 -mt-0.5" />
+              <ExternalLink className="w-3.5 h-3.5 opacity-60" />
             </a>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        {/* Footer */}
-        <div className="text-center mt-12">
-          <p className="text-xs opacity-30">
-            Powered by{" "}
-            <Link href="/" className="underline hover:opacity-60">
-              CardCrafter
-            </Link>
-          </p>
+      {/* Footer — viral CTA */}
+      <div className="max-w-md mx-auto px-4 py-10 text-center">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all hover:shadow-md"
+          style={{ backgroundColor: theme.primaryColor + "12", color: theme.primaryColor }}
+        >
+          <div className="w-5 h-5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md flex items-center justify-center">
+            <Layers className="w-3 h-3 text-white" />
+          </div>
+          <Link href="/" className="hover:underline">
+            Create your free card with CardCrafter →
+          </Link>
         </div>
       </div>
     </div>
