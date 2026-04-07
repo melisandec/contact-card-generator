@@ -42,7 +42,6 @@ import {
   AlertCircle,
   ArrowDownToLine,
   ArrowUpFromLine,
-  BarChart2,
   Link,
   TrendingUp,
   Bell,

@@ -36,20 +36,7 @@ export function PropertiesPanel() {
 
   const selected = elements.find((e) => e.id === selectedElementId);
 
-  if (!selected) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm px-4 text-center">
-        <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-3">
-          <RotateCcw className="w-5 h-5" />
-        </div>
-        <p className="font-medium text-slate-500">No element selected</p>
-        <p className="text-xs mt-1">Click an element on the canvas to edit its properties</p>
-      </div>
-    );
-  }
-
-  const update = (updates: Partial<DesignElement>) => updateElement(selected.id, updates);
-
+  // Must be defined before any early return (Rules of Hooks)
   const regenerateQR = useCallback(async () => {
     if (!selected || selected.type !== 'qrcode' || !selected.qrData) return;
     setQrRegenerating(true);
@@ -76,6 +63,20 @@ export function PropertiesPanel() {
       setQrRegenerating(false);
     }
   }, [selected, updateElement]);
+
+  if (!selected) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm px-4 text-center">
+        <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-3">
+          <RotateCcw className="w-5 h-5" />
+        </div>
+        <p className="font-medium text-slate-500">No element selected</p>
+        <p className="text-xs mt-1">Click an element on the canvas to edit its properties</p>
+      </div>
+    );
+  }
+
+  const update = (updates: Partial<DesignElement>) => updateElement(selected.id, updates);
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
