@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useDesignStore } from '@/store/design-store';
 import { useUIStore } from '@/store/ui-store';
 import { Button } from '@/components/ui/Button';
@@ -20,6 +21,8 @@ import {
   Lock,
   Sparkles,
   CreditCard,
+  ChevronLeft,
+  LayoutGrid,
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clamp, cn } from '@/lib/utils';
@@ -50,10 +53,21 @@ export function Toolbar({ splitView, onToggleSplitView, onOpenAIGenerator, child
 
   return (
     <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200 bg-white h-14">
+      {/* Back to My Cards */}
+      <Link
+        href="/my-cards"
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors group mr-1"
+        title="Back to My Cards"
+      >
+        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+        <LayoutGrid className="w-4 h-4" />
+        <span className="text-xs font-medium hidden sm:inline">My Cards</span>
+      </Link>
+
       {/* Logo */}
-      <div className="flex items-center gap-2 mr-4">
+      <div className="flex items-center gap-2 mr-2">
         <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md" />
-        <span className="font-bold text-sm text-slate-800">CardCrafter</span>
+        <span className="font-bold text-sm text-slate-800 hidden md:inline">CardCrafter</span>
       </div>
 
       <div className="h-5 w-px bg-slate-200" />
