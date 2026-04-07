@@ -89,6 +89,7 @@ export async function PUT(
       designId,
       contactData,
       isPublic,
+      notifyOnScan,
     } = body;
 
     // Validate and check slug uniqueness if provided
@@ -133,6 +134,7 @@ export async function PUT(
         ...(designId !== undefined && { designId }),
         ...(contactData !== undefined && { contactData }),
         ...(isPublic !== undefined && { isPublic }),
+        ...(notifyOnScan !== undefined && { notifyOnScan }),
       },
     });
 

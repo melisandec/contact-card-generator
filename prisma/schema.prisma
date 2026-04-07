@@ -209,6 +209,9 @@ model DigitalProfile {
   // Visibility
   isPublic    Boolean  @default(true)
 
+  // Notifications: email owner when their card is scanned
+  notifyOnScan Boolean @default(false)
+
   // Contact data for vCard generation
   contactData Json?
 

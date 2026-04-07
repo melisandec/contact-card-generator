@@ -307,17 +307,35 @@ export default function ProfilePageClient({
       </div>
 
       {/* Footer — viral CTA */}
-      <div className="max-w-md mx-auto px-4 py-10 text-center">
+      <div className="max-w-md mx-auto px-4 pb-10 pt-4">
         <div
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all hover:shadow-md"
-          style={{ backgroundColor: theme.primaryColor + "12", color: theme.primaryColor }}
+          className="rounded-2xl p-5 text-center"
+          style={{ backgroundColor: theme.primaryColor + "0a", border: `1px solid ${theme.primaryColor}18` }}
         >
-          <div className="w-5 h-5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md flex items-center justify-center">
-            <Layers className="w-3 h-3 text-white" />
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+              <Layers className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold text-sm" style={{ color: theme.textColor }}>CardCrafter</span>
           </div>
-          <Link href="/" className="hover:underline">
-            Create your free card with CardCrafter →
+          <p className="text-sm font-medium mb-1" style={{ color: theme.textColor }}>
+            Like this digital card?
+          </p>
+          <p className="text-xs mb-4" style={{ color: theme.textColor, opacity: 0.55 }}>
+            Create your own free card in minutes — share your contact instantly, track who views it.
+          </p>
+          <Link
+            href="/?utm_source=viral_card&utm_medium=profile_footer&utm_campaign=scan"
+            onClick={() => trackAction(profile.id, "viral_click")}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+            style={{ backgroundColor: theme.primaryColor }}
+          >
+            <Layers className="w-4 h-4" />
+            Create my free card →
           </Link>
+          <p className="mt-3 text-[11px]" style={{ color: theme.textColor, opacity: 0.35 }}>
+            Free · No credit card required
+          </p>
         </div>
       </div>
     </div>

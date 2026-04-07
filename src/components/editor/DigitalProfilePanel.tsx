@@ -45,6 +45,9 @@ import {
   BarChart2,
   Link,
   TrendingUp,
+  Bell,
+  BellOff,
+  FileCode,
 } from "lucide-react";
 import { cardToProfile, profileToCard, type ProfileData } from "@/lib/fieldSync";
 
@@ -119,7 +122,10 @@ export function DigitalProfilePanel() {
     ctaButton: null as ProfileCTA | null,
     theme: { ...DEFAULT_THEME },
     isPublic: true,
+    notifyOnScan: false,
   });
+  const [signatureCopied, setSignatureCopied] = useState(false);
+  const [showSignaturePreview, setShowSignaturePreview] = useState(false);
 
   // Load selected profile into form
   useEffect(() => {
@@ -142,6 +148,7 @@ export function DigitalProfilePanel() {
           ctaButton: p.ctaButton || null,
           theme: p.theme || { ...DEFAULT_THEME },
           isPublic: p.isPublic,
+          notifyOnScan: (p as DigitalProfile & { notifyOnScan?: boolean }).notifyOnScan ?? false,
         });
       }
     }
@@ -259,6 +266,34 @@ export function DigitalProfilePanel() {
     setElements(updated);
   };
 
+  const buildEmailSignatureHtml = (profileUrl: string, qrDataUrl?: string) => {
+    const name = form.fullName || "Your Name";
+    const primary = form.theme.primaryColor;
+    return `<table cellpadding="0" cellspacing="0" style="font-family:'Inter',Arial,sans-serif;font-size:13px;color:#374151;border-top:3px solid ${primary};padding-top:12px;max-width:480px;">
+  <tr>
+    <td style="padding-right:16px;vertical-align:top;">${qrDataUrl ? `<img src="${qrDataUrl}" width="72" height="72" alt="QR" style="display:block;border-radius:8px;" />` : ""}</td>
+    <td style="vertical-align:top;">
+      <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:2px;">${name}</div>
+      ${form.title || form.company ? `<div style="font-size:12px;color:#6b7280;margin-bottom:6px;">${[form.title, form.company].filter(Boolean).join(" · ")}</div>` : ""}
+      ${form.email ? `<div style="margin-bottom:2px;"><a href="mailto:${form.email}" style="color:${primary};text-decoration:none;font-size:12px;">✉ ${form.email}</a></div>` : ""}
+      ${form.phone ? `<div style="margin-bottom:2px;"><a href="tel:${form.phone}" style="color:${primary};text-decoration:none;font-size:12px;">📞 ${form.phone}</a></div>` : ""}
+      ${form.website ? `<div style="margin-bottom:6px;"><a href="${form.website.startsWith("http") ? form.website : "https://" + form.website}" style="color:${primary};text-decoration:none;font-size:12px;">🌐 ${form.website}</a></div>` : ""}
+      <div><a href="${profileUrl}" style="display:inline-block;margin-top:4px;padding:5px 12px;background:${primary};color:#fff;font-size:11px;font-weight:600;text-decoration:none;border-radius:6px;">View my card →</a></div>
+    </td>
+  </tr>
+</table>`;
+  };
+
+  const handleCopySignature = async () => {
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://cardcrafter.app";
+    const selectedProfile = profiles.find((p) => p.id === selectedProfileId);
+    const profileUrl = selectedProfile ? `${baseUrl}/p/${selectedProfile.slug}` : baseUrl;
+    const html = buildEmailSignatureHtml(profileUrl, qrData?.dataUrl);
+    await navigator.clipboard.writeText(html);
+    setSignatureCopied(true);
+    setTimeout(() => setSignatureCopied(false), 2500);
+  };
+
   const addSocialLink = () => {
     setForm((prev) => ({
       ...prev,
@@ -337,6 +372,7 @@ export function DigitalProfilePanel() {
                 ctaButton: null,
                 theme: { ...DEFAULT_THEME },
                 isPublic: true,
+                notifyOnScan: false,
               });
             }}
             className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
@@ -967,6 +1003,102 @@ export function DigitalProfilePanel() {
             <Download className="w-3 h-3" />
             Download QR Image
           </a>
+        </div>
+      )}
+
+      {/* Section: Notifications */}
+      {selectedProfileId && (
+        <div className="pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {form.notifyOnScan ? (
+                <Bell className="w-3.5 h-3.5 text-indigo-500" />
+              ) : (
+                <BellOff className="w-3.5 h-3.5 text-slate-400" />
+              )}
+              <div>
+                <p className="text-xs font-medium text-slate-700">Scan Notifications</p>
+                <p className="text-[10px] text-slate-400">Email me when someone views my card</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setForm((f) => ({ ...f, notifyOnScan: !f.notifyOnScan }))}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                form.notifyOnScan ? "bg-indigo-500" : "bg-slate-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                  form.notifyOnScan ? "translate-x-4" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+          {form.notifyOnScan && (
+            <p className="mt-1.5 text-[10px] text-slate-400 leading-relaxed">
+              Rate-limited to 1 email per unique visitor per day. Requires{" "}
+              <span className="font-mono text-indigo-500">RESEND_API_KEY</span> in your environment.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Section: Email Signature Generator */}
+      {selectedProfileId && (
+        <div className="pt-2 border-t border-slate-100 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileCode className="w-3.5 h-3.5 text-slate-400" />
+              <p className="text-xs font-medium text-slate-700">Email Signature</p>
+            </div>
+            <button
+              onClick={() => setShowSignaturePreview((v) => !v)}
+              className="text-[10px] text-indigo-500 hover:text-indigo-600 font-medium"
+            >
+              {showSignaturePreview ? "Hide" : "Preview"}
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-400 leading-relaxed">
+            Generate a professional HTML email signature with your QR code and profile link.
+            {!qrData && " Generate a QR code above first to include it in the signature."}
+          </p>
+          {showSignaturePreview && (
+            <div className="border border-slate-200 rounded-lg overflow-hidden">
+              <div className="bg-white p-3">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: buildEmailSignatureHtml(
+                      `${typeof window !== "undefined" ? window.location.origin : "https://cardcrafter.app"}/p/${
+                        profiles.find((p) => p.id === selectedProfileId)?.slug ?? ""
+                      }`,
+                      qrData?.dataUrl,
+                    ),
+                  }}
+                />
+              </div>
+              <div className="border-t border-slate-100 bg-slate-50 px-3 py-2">
+                <p className="text-[10px] text-slate-400">
+                  Live preview — paste in Gmail, Outlook, or Apple Mail signature settings
+                </p>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={handleCopySignature}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-colors"
+          >
+            {signatureCopied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-green-500" />
+                <span className="text-green-600">HTML copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                Copy Signature HTML
+              </>
+            )}
+          </button>
         </div>
       )}
 

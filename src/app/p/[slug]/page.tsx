@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 import { headers } from "next/headers";
 import type { Metadata } from "next";
 import ProfilePageClient from "./ProfilePageClient";
+import { sendScanNotification } from "@/lib/email";
 
 interface ProfilePageProps {
   params: Promise<{ slug: string }>;
@@ -61,6 +62,45 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       },
     })
     .catch(() => {});
+
+  // Scan notification: email the owner once per unique IP per day
+  if (profile.notifyOnScan) {
+    (async () => {
+      try {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const alreadyNotifiedToday = await prisma.profileView.findFirst({
+          where: {
+            profileId: profile.id,
+            ipHash,
+            action: "view",
+            createdAt: { gte: todayStart },
+          },
+          orderBy: { createdAt: "asc" },
+        });
+        // Only notify on the first view from this IP today
+        if (!alreadyNotifiedToday) {
+          const owner = await prisma.user.findUnique({
+            where: { id: profile.userId },
+            select: { email: true, name: true },
+          });
+          if (owner?.email) {
+            const baseUrl = process.env.NEXTAUTH_URL ?? "https://cardcrafter.app";
+            await sendScanNotification({
+              ownerEmail: owner.email,
+              ownerName: owner.name ?? profile.fullName,
+              profileName: profile.fullName,
+              profileSlug: profile.slug,
+              profileUrl: `${baseUrl}/p/${profile.slug}`,
+              action: "view",
+            });
+          }
+        }
+      } catch {
+        // Never let notification errors affect the page
+      }
+    })();
+  }
 
   const theme = (profile.theme as {
     primaryColor: string;

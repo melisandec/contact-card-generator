@@ -369,6 +369,7 @@ export interface DigitalProfile {
   theme: ProfileTheme;
 
   isPublic: boolean;
+  notifyOnScan?: boolean;
   contactData?: ContactData;
 
   createdAt: string;
